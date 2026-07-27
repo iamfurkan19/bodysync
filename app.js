@@ -1,16 +1,36 @@
 "use strict";
 
-const STORAGE_KEY = "bodysync-foods-v1";
+const STORAGE_KEY = "bodysync-data-v2";
+const OLD_STORAGE_KEY = "bodysync-foods-v1";
 
 const dailyGoals = {
     calories: 2000,
     protein: 160
 };
 
-let foods = [];
+let appData = {
+    foodsByDate: {}
+};
+
+let selectedDateKey = getTodayKey();
+let calendarMonth = startOfMonth(parseDateKey(selectedDateKey));
+let currentView = "dashboard";
 
 const elements = {
-    currentDate: document.getElementById("currentDate"),
+    headerDate: document.getElementById("headerDate"),
+    todayButton: document.getElementById("todayButton"),
+
+    dashboardView: document.getElementById("dashboardView"),
+    calendarView: document.getElementById("calendarView"),
+    dashboardTab: document.getElementById("dashboardTab"),
+    calendarTab: document.getElementById("calendarTab"),
+
+    summaryTitle: document.getElementById("summaryTitle"),
+    selectedDateText: document.getElementById("selectedDateText"),
+    foodSectionTitle: document.getElementById("foodSectionTitle"),
+    emptyStateText: document.getElementById("emptyStateText"),
+    openCalendarButton:
+        document.getElementById("openCalendarButton"),
 
     caloriesConsumed:
         document.getElementById("caloriesConsumed"),
@@ -34,23 +54,39 @@ const elements = {
     proteinProgressTrack:
         document.getElementById("proteinProgressTrack"),
 
-    foodList:
-        document.getElementById("foodList"),
-    emptyState:
-        document.getElementById("emptyState"),
+    foodList: document.getElementById("foodList"),
+    emptyState: document.getElementById("emptyState"),
 
-    foodDialog:
-        document.getElementById("foodDialog"),
-    foodForm:
-        document.getElementById("foodForm"),
-    foodName:
-        document.getElementById("foodName"),
-    foodCalories:
-        document.getElementById("foodCalories"),
-    foodProtein:
-        document.getElementById("foodProtein"),
-    formError:
-        document.getElementById("formError"),
+    calendarMonthTitle:
+        document.getElementById("calendarMonthTitle"),
+    calendarGrid:
+        document.getElementById("calendarGrid"),
+    previousMonthButton:
+        document.getElementById("previousMonthButton"),
+    nextMonthButton:
+        document.getElementById("nextMonthButton"),
+    calendarTodayButton:
+        document.getElementById("calendarTodayButton"),
+
+    calendarSelectedDate:
+        document.getElementById("calendarSelectedDate"),
+    calendarCalories:
+        document.getElementById("calendarCalories"),
+    calendarProtein:
+        document.getElementById("calendarProtein"),
+    calendarFoodCount:
+        document.getElementById("calendarFoodCount"),
+    openSelectedDayButton:
+        document.getElementById("openSelectedDayButton"),
+
+    foodDialog: document.getElementById("foodDialog"),
+    foodForm: document.getElementById("foodForm"),
+    foodName: document.getElementById("foodName"),
+    foodCalories: document.getElementById("foodCalories"),
+    foodProtein: document.getElementById("foodProtein"),
+    formError: document.getElementById("formError"),
+    dialogDateLabel:
+        document.getElementById("dialogDateLabel"),
 
     openFoodDialog:
         document.getElementById("openFoodDialog"),
@@ -60,18 +96,84 @@ const elements = {
         document.getElementById("closeFoodDialog")
 };
 
-function formatCurrentDate() {
-    const formatter = new Intl.DateTimeFormat("de-DE", {
+function padNumber(value) {
+    return String(value).padStart(2, "0");
+}
+
+function createDateKey(date) {
+    return [
+        date.getFullYear(),
+        padNumber(date.getMonth() + 1),
+        padNumber(date.getDate())
+    ].join("-");
+}
+
+function getTodayKey() {
+    return createDateKey(new Date());
+}
+
+function parseDateKey(dateKey) {
+    const parts = dateKey.split("-").map(Number);
+
+    return new Date(
+        parts[0],
+        parts[1] - 1,
+        parts[2],
+        12,
+        0,
+        0
+    );
+}
+
+function startOfMonth(date) {
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        1,
+        12,
+        0,
+        0
+    );
+}
+
+function addMonths(date, amount) {
+    return new Date(
+        date.getFullYear(),
+        date.getMonth() + amount,
+        1,
+        12,
+        0,
+        0
+    );
+}
+
+function isToday(dateKey) {
+    return dateKey === getTodayKey();
+}
+
+function formatDateLong(dateKey) {
+    return new Intl.DateTimeFormat("de-DE", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    }).format(parseDateKey(dateKey));
+}
+
+function formatDateShort(dateKey) {
+    return new Intl.DateTimeFormat("de-DE", {
         weekday: "long",
         day: "2-digit",
         month: "long"
-    });
+    }).format(parseDateKey(dateKey));
+}
 
-    const formattedDate = formatter.format(new Date());
+function capitalizeFirstLetter(value) {
+    if (!value) {
+        return "";
+    }
 
-    elements.currentDate.textContent =
-        formattedDate.charAt(0).toUpperCase() +
-        formattedDate.slice(1);
+    return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function createFoodId() {
@@ -87,7 +189,7 @@ function createFoodId() {
         .slice(2)}`;
 }
 
-function isValidStoredFood(food) {
+function isValidFood(food) {
     return (
         food &&
         typeof food.id === "string" &&
@@ -99,56 +201,142 @@ function isValidStoredFood(food) {
     );
 }
 
-function loadFoods() {
+function sanitizeFoods(foods) {
+    if (!Array.isArray(foods)) {
+        return [];
+    }
+
+    return foods
+        .filter(isValidFood)
+        .map((food) => ({
+            id: food.id,
+            name: food.name.trim(),
+            calories: Math.round(food.calories),
+            protein:
+                Math.round(food.protein * 10) / 10
+        }));
+}
+
+function migrateOldData() {
     try {
-        const storedValue = localStorage.getItem(STORAGE_KEY);
+        const oldValue = localStorage.getItem(
+            OLD_STORAGE_KEY
+        );
 
-        if (!storedValue) {
-            foods = [];
-            return;
+        if (!oldValue) {
+            return false;
         }
 
-        const parsedFoods = JSON.parse(storedValue);
+        const oldFoods = sanitizeFoods(
+            JSON.parse(oldValue)
+        );
 
-        if (!Array.isArray(parsedFoods)) {
-            foods = [];
-            return;
+        if (oldFoods.length === 0) {
+            return false;
         }
 
-        foods = parsedFoods
-            .filter(isValidStoredFood)
-            .map((food) => ({
-                id: food.id,
-                name: food.name.trim(),
-                calories: Math.round(food.calories),
-                protein:
-                    Math.round(food.protein * 10) / 10
-            }));
+        appData.foodsByDate[getTodayKey()] = oldFoods;
+
+        localStorage.removeItem(OLD_STORAGE_KEY);
+
+        return true;
     } catch (error) {
         console.error(
-            "Gespeicherte Lebensmittel konnten nicht geladen werden:",
+            "Alte Daten konnten nicht übernommen werden:",
             error
         );
 
-        foods = [];
+        return false;
     }
 }
 
-function saveFoods() {
+function loadData() {
+    try {
+        const storedValue = localStorage.getItem(
+            STORAGE_KEY
+        );
+
+        if (storedValue) {
+            const parsedData = JSON.parse(storedValue);
+
+            if (
+                parsedData &&
+                typeof parsedData === "object" &&
+                parsedData.foodsByDate &&
+                typeof parsedData.foodsByDate === "object"
+            ) {
+                const cleanedFoodsByDate = {};
+
+                Object.entries(
+                    parsedData.foodsByDate
+                ).forEach(([dateKey, foods]) => {
+                    const cleanedFoods = sanitizeFoods(foods);
+
+                    if (cleanedFoods.length > 0) {
+                        cleanedFoodsByDate[dateKey] =
+                            cleanedFoods;
+                    }
+                });
+
+                appData = {
+                    foodsByDate: cleanedFoodsByDate
+                };
+
+                return;
+            }
+        }
+
+        appData = {
+            foodsByDate: {}
+        };
+
+        const dataMigrated = migrateOldData();
+
+        if (dataMigrated) {
+            saveData();
+        }
+    } catch (error) {
+        console.error(
+            "Gespeicherte Daten konnten nicht geladen werden:",
+            error
+        );
+
+        appData = {
+            foodsByDate: {}
+        };
+    }
+}
+
+function saveData() {
     try {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify(foods)
+            JSON.stringify(appData)
         );
     } catch (error) {
         console.error(
-            "Lebensmittel konnten nicht gespeichert werden:",
+            "Daten konnten nicht gespeichert werden:",
             error
         );
     }
 }
 
-function calculateTotals() {
+function getFoodsForDate(dateKey) {
+    const foods = appData.foodsByDate[dateKey];
+
+    return Array.isArray(foods) ? foods : [];
+}
+
+function setFoodsForDate(dateKey, foods) {
+    if (foods.length === 0) {
+        delete appData.foodsByDate[dateKey];
+        return;
+    }
+
+    appData.foodsByDate[dateKey] = foods;
+}
+
+function calculateTotals(foods) {
     return foods.reduce(
         (totals, food) => {
             totals.calories += food.calories;
@@ -180,8 +368,52 @@ function formatProtein(value) {
         : value.toFixed(1);
 }
 
+function updateDateLabels() {
+    const formattedDate = capitalizeFirstLetter(
+        formatDateShort(selectedDateKey)
+    );
+
+    elements.headerDate.textContent = isToday(
+        selectedDateKey
+    )
+        ? `Heute · ${formattedDate}`
+        : formattedDate;
+
+    elements.summaryTitle.textContent = isToday(
+        selectedDateKey
+    )
+        ? "Bleib heute im Rhythmus"
+        : "Dein ausgewählter Tag";
+
+    elements.selectedDateText.textContent = isToday(
+        selectedDateKey
+    )
+        ? "Deine Werte für heute."
+        : `Werte für ${formatDateLong(
+            selectedDateKey
+        )}.`;
+
+    elements.foodSectionTitle.textContent = isToday(
+        selectedDateKey
+    )
+        ? "Heute gegessen"
+        : "Einträge dieses Tages";
+
+    elements.emptyStateText.textContent = isToday(
+        selectedDateKey
+    )
+        ? "Füge dein erstes Lebensmittel hinzu."
+        : "Für diesen Tag sind noch keine Lebensmittel eingetragen.";
+
+    elements.dialogDateLabel.textContent =
+        capitalizeFirstLetter(
+            formatDateShort(selectedDateKey)
+        );
+}
+
 function updateDashboard() {
-    const totals = calculateTotals();
+    const foods = getFoodsForDate(selectedDateKey);
+    const totals = calculateTotals(foods);
 
     const caloriesPercentage = calculatePercentage(
         totals.calories,
@@ -262,6 +494,8 @@ function createDeleteIcon() {
 }
 
 function renderFoods() {
+    const foods = getFoodsForDate(selectedDateKey);
+
     elements.foodList.innerHTML = "";
 
     elements.emptyState.classList.toggle(
@@ -292,7 +526,9 @@ function renderFoods() {
         nutrition.append(calories, protein);
         information.append(title, nutrition);
 
-        const deleteButton = document.createElement("button");
+        const deleteButton =
+            document.createElement("button");
+
         deleteButton.className = "delete-button";
         deleteButton.type = "button";
         deleteButton.setAttribute(
@@ -307,13 +543,159 @@ function renderFoods() {
     });
 }
 
+function updateCalendarSummary() {
+    const foods = getFoodsForDate(selectedDateKey);
+    const totals = calculateTotals(foods);
+
+    elements.calendarSelectedDate.textContent =
+        isToday(selectedDateKey)
+            ? "Heute"
+            : capitalizeFirstLetter(
+                formatDateShort(selectedDateKey)
+            );
+
+    elements.calendarCalories.textContent =
+        Math.round(totals.calories);
+
+    elements.calendarProtein.textContent =
+        formatProtein(totals.protein);
+
+    elements.calendarFoodCount.textContent =
+        foods.length;
+}
+
+function getCalendarStartDate(monthDate) {
+    const firstDay = startOfMonth(monthDate);
+    const weekday = firstDay.getDay();
+    const daysFromMonday = (weekday + 6) % 7;
+
+    const calendarStart = new Date(firstDay);
+    calendarStart.setDate(
+        firstDay.getDate() - daysFromMonday
+    );
+
+    return calendarStart;
+}
+
+function renderCalendar() {
+    elements.calendarGrid.innerHTML = "";
+
+    elements.calendarMonthTitle.textContent =
+        capitalizeFirstLetter(
+            new Intl.DateTimeFormat("de-DE", {
+                month: "long",
+                year: "numeric"
+            }).format(calendarMonth)
+        );
+
+    const calendarStart =
+        getCalendarStartDate(calendarMonth);
+
+    for (let index = 0; index < 42; index += 1) {
+        const date = new Date(calendarStart);
+        date.setDate(calendarStart.getDate() + index);
+
+        const dateKey = createDateKey(date);
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "calendar-day";
+        button.textContent = date.getDate();
+        button.dataset.dateKey = dateKey;
+
+        const isOutsideMonth =
+            date.getMonth() !== calendarMonth.getMonth();
+
+        if (isOutsideMonth) {
+            button.classList.add("outside-month");
+        }
+
+        if (dateKey === getTodayKey()) {
+            button.classList.add("today");
+        }
+
+        if (dateKey === selectedDateKey) {
+            button.classList.add("selected");
+        }
+
+        if (getFoodsForDate(dateKey).length > 0) {
+            button.classList.add("has-entries");
+        }
+
+        button.setAttribute(
+            "aria-label",
+            formatDateLong(dateKey)
+        );
+
+        elements.calendarGrid.append(button);
+    }
+
+    updateCalendarSummary();
+}
+
 function renderApp() {
+    updateDateLabels();
     renderFoods();
     updateDashboard();
+    renderCalendar();
+}
+
+function switchView(viewName) {
+    currentView = viewName;
+
+    const showDashboard =
+        viewName === "dashboard";
+
+    elements.dashboardView.classList.toggle(
+        "active",
+        showDashboard
+    );
+
+    elements.calendarView.classList.toggle(
+        "active",
+        !showDashboard
+    );
+
+    elements.dashboardTab.classList.toggle(
+        "active",
+        showDashboard
+    );
+
+    elements.calendarTab.classList.toggle(
+        "active",
+        !showDashboard
+    );
+
+    if (!showDashboard) {
+        calendarMonth = startOfMonth(
+            parseDateKey(selectedDateKey)
+        );
+
+        renderCalendar();
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function selectDate(dateKey, openDashboard = false) {
+    selectedDateKey = dateKey;
+    calendarMonth = startOfMonth(
+        parseDateKey(dateKey)
+    );
+
+    renderApp();
+
+    if (openDashboard) {
+        switchView("dashboard");
+    }
 }
 
 function openDialog() {
     elements.formError.textContent = "";
+    updateDateLabels();
 
     if (
         typeof elements.foodDialog.showModal ===
@@ -389,19 +771,26 @@ function addFood(event) {
             Math.round(protein * 10) / 10
     };
 
-    foods.unshift(food);
+    const foods = [
+        food,
+        ...getFoodsForDate(selectedDateKey)
+    ];
 
-    saveFoods();
+    setFoodsForDate(selectedDateKey, foods);
+
+    saveData();
     closeDialog();
     renderApp();
 }
 
 function deleteFood(foodId) {
-    foods = foods.filter(
-        (food) => food.id !== foodId
-    );
+    const foods = getFoodsForDate(
+        selectedDateKey
+    ).filter((food) => food.id !== foodId);
 
-    saveFoods();
+    setFoodsForDate(selectedDateKey, foods);
+
+    saveData();
     renderApp();
 }
 
@@ -415,6 +804,27 @@ function handleFoodListClick(event) {
     }
 
     deleteFood(deleteButton.dataset.foodId);
+}
+
+function handleCalendarClick(event) {
+    const dayButton = event.target.closest(
+        ".calendar-day"
+    );
+
+    if (!dayButton) {
+        return;
+    }
+
+    selectedDateKey = dayButton.dataset.dateKey;
+    calendarMonth = startOfMonth(
+        parseDateKey(selectedDateKey)
+    );
+
+    renderApp();
+}
+
+function goToToday(openDashboard = false) {
+    selectDate(getTodayKey(), openDashboard);
 }
 
 function registerServiceWorker() {
@@ -433,6 +843,65 @@ function registerServiceWorker() {
             });
     });
 }
+
+elements.dashboardTab.addEventListener(
+    "click",
+    () => switchView("dashboard")
+);
+
+elements.calendarTab.addEventListener(
+    "click",
+    () => switchView("calendar")
+);
+
+elements.openCalendarButton.addEventListener(
+    "click",
+    () => switchView("calendar")
+);
+
+elements.todayButton.addEventListener(
+    "click",
+    () => goToToday(true)
+);
+
+elements.calendarTodayButton.addEventListener(
+    "click",
+    () => goToToday(false)
+);
+
+elements.openSelectedDayButton.addEventListener(
+    "click",
+    () => switchView("dashboard")
+);
+
+elements.previousMonthButton.addEventListener(
+    "click",
+    () => {
+        calendarMonth = addMonths(
+            calendarMonth,
+            -1
+        );
+
+        renderCalendar();
+    }
+);
+
+elements.nextMonthButton.addEventListener(
+    "click",
+    () => {
+        calendarMonth = addMonths(
+            calendarMonth,
+            1
+        );
+
+        renderCalendar();
+    }
+);
+
+elements.calendarGrid.addEventListener(
+    "click",
+    handleCalendarClick
+);
 
 elements.openFoodDialog.addEventListener(
     "click",
@@ -468,7 +937,7 @@ elements.foodDialog.addEventListener(
     }
 );
 
-formatCurrentDate();
-loadFoods();
+loadData();
 renderApp();
+switchView(currentView);
 registerServiceWorker();
