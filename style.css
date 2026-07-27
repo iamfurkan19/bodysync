@@ -6,14 +6,23 @@
     --surface-soft: #f7f8f9;
     --text: #171a1d;
     --text-soft: #6c7279;
+
     --primary: #315c4b;
     --primary-dark: #244638;
     --primary-soft: #dfebe6;
-    --border: #e5e8eb;
-    --danger: #a63b3b;
-    --danger-soft: #faeaea;
+
+    --food: #a66a3f;
+    --food-dark: #7b4c2d;
+    --food-soft: #f3e7dc;
+
     --weight: #5970a8;
     --weight-soft: #e7ebf5;
+
+    --border: #e5e8eb;
+
+    --danger: #a63b3b;
+    --danger-dark: #812d2d;
+    --danger-soft: #faeaea;
 
     --shadow:
         0 18px 45px rgba(25, 35, 31, 0.08);
@@ -51,10 +60,6 @@ input {
 
 button {
     -webkit-tap-highlight-color: transparent;
-}
-
-button:disabled {
-    cursor: default;
 }
 
 .app-shell {
@@ -123,6 +128,7 @@ button:disabled {
 }
 
 .summary-card,
+.food-hero-card,
 .weight-hero-card,
 .settings-hero-card {
     padding: 27px;
@@ -132,22 +138,39 @@ button:disabled {
 }
 
 .summary-card {
-    background: linear-gradient(145deg, #315c4b, #244638);
+    background:
+        linear-gradient(
+            145deg,
+            #315c4b,
+            #244638
+        );
+}
+
+.food-hero-card {
+    background:
+        linear-gradient(
+            145deg,
+            #a66a3f,
+            #75482b
+        );
 }
 
 .weight-hero-card {
-    background: linear-gradient(145deg, #5970a8, #3f527e);
+    background:
+        linear-gradient(
+            145deg,
+            #5970a8,
+            #3f527e
+        );
 }
 
 .settings-hero-card {
-    background: linear-gradient(145deg, #4f655e, #30443d);
-}
-
-.settings-hero-card h2 {
-    margin: 18px 0 10px;
-    font-size: 30px;
-    line-height: 1.1;
-    letter-spacing: -0.9px;
+    background:
+        linear-gradient(
+            145deg,
+            #4f655e,
+            #30443d
+        );
 }
 
 .summary-topline,
@@ -179,7 +202,9 @@ button:disabled {
     cursor: pointer;
 }
 
-.summary-card h2 {
+.summary-card h2,
+.food-hero-card h2,
+.settings-hero-card h2 {
     margin: 17px 0 11px;
     font-size: 29px;
     line-height: 1.08;
@@ -285,7 +310,8 @@ button:disabled {
 .secondary-button,
 .submit-button,
 .primary-wide-button,
-.secondary-wide-button {
+.secondary-wide-button,
+.danger-wide-button {
     border: 0;
     cursor: pointer;
     font-weight: 750;
@@ -307,6 +333,7 @@ button:disabled {
 
 .primary-wide-button,
 .secondary-wide-button,
+.danger-wide-button,
 .submit-button {
     width: 100%;
     min-height: 50px;
@@ -325,10 +352,40 @@ button:disabled {
     color: var(--primary-dark);
 }
 
+.danger-wide-button {
+    margin-top: 18px;
+    background: var(--danger);
+    color: #ffffff;
+}
+
+.danger-wide-button:active {
+    background: var(--danger-dark);
+}
+
+.no-margin {
+    margin-top: 0;
+}
+
+.text-button {
+    width: 100%;
+    margin-top: 17px;
+    padding: 8px;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
 .item-list {
     display: grid;
     gap: 11px;
     margin-top: 20px;
+}
+
+.compact-list .list-item:nth-child(n + 4) {
+    display: none;
 }
 
 .list-item {
@@ -390,12 +447,18 @@ button:disabled {
     color: var(--danger);
 }
 
+.edit-button:active,
+.delete-button:active {
+    transform: scale(0.96);
+}
+
 .edit-button svg,
 .delete-button svg,
 .empty-icon svg,
 .calendar-arrow svg,
 .icon-button svg,
-.tab-button svg {
+.tab-button svg,
+.confirmation-icon svg {
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -453,6 +516,36 @@ button:disabled {
     color: var(--text-soft);
     font-size: 14px;
     line-height: 1.45;
+}
+
+.food-hero-values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.food-hero-values div {
+    min-width: 0;
+    padding: 13px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.food-hero-values strong {
+    display: block;
+    overflow: hidden;
+    font-size: 23px;
+    text-overflow: ellipsis;
+}
+
+.food-hero-values span {
+    display: block;
+    margin-top: 4px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 10px;
 }
 
 .calendar-controls {
@@ -667,6 +760,7 @@ button:disabled {
 
 .form-field input {
     width: 100%;
+    min-width: 0;
     height: 52px;
     padding: 0 15px;
     border: 1px solid var(--border);
@@ -723,11 +817,47 @@ button:disabled {
     color: var(--primary);
 }
 
-.information-card p:last-child {
+.card-description {
     margin: 14px 0 0;
     color: var(--text-soft);
     font-size: 14px;
     line-height: 1.55;
+}
+
+.settings-actions {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.hidden-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.danger-card {
+    border: 1px solid rgba(166, 59, 59, 0.12);
+}
+
+.danger-eyebrow {
+    color: var(--danger);
+}
+
+.version-card {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 8px;
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.version-card strong {
+    color: var(--text);
 }
 
 .tab-bar {
@@ -770,10 +900,6 @@ button:disabled {
 .tab-button.active {
     color: var(--primary);
     font-weight: 750;
-}
-
-.tab-button:disabled {
-    opacity: 0.72;
 }
 
 .app-dialog {
@@ -838,6 +964,72 @@ button:disabled {
     margin-top: 5px;
 }
 
+.confirmation-dialog {
+    text-align: center;
+}
+
+.confirmation-icon {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.confirmation-icon svg {
+    width: 27px;
+    height: 27px;
+}
+
+.confirmation-dialog h2 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: -0.6px;
+}
+
+.confirmation-dialog p {
+    margin: 10px 0 22px;
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.confirmation-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.toast {
+    position: fixed;
+    z-index: 50;
+    left: 50%;
+    bottom: calc(94px + env(safe-area-inset-bottom));
+    max-width: calc(100% - 32px);
+    transform: translate(-50%, 25px);
+    padding: 12px 17px;
+    border-radius: 15px;
+    background: rgba(23, 26, 29, 0.92);
+    color: #ffffff;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    font-size: 13px;
+    font-weight: 650;
+    text-align: center;
+    transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+}
+
+.toast.visible {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
 @media (max-width: 390px) {
     .app-shell {
         padding-left: 14px;
@@ -853,6 +1045,10 @@ button:disabled {
     .calendar-day {
         border-radius: 10px;
         font-size: 12px;
+    }
+
+    .confirmation-actions {
+        grid-template-columns: 1fr;
     }
 }
 
