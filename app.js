@@ -1,7 +1,7 @@
 "use strict";
 
-const STORAGE_KEY = "bodysync-data-v2";
-const OLD_STORAGE_KEY = "bodysync-foods-v1";
+const STORAGE_KEY = "bodysync-data-v3";
+const OLD_STORAGE_KEY = "bodysync-data-v2";
 
 const dailyGoals = {
     calories: 2000,
@@ -9,12 +9,14 @@ const dailyGoals = {
 };
 
 let appData = {
-    foodsByDate: {}
+    foodsByDate: {},
+    weightsByDate: {}
 };
 
 let selectedDateKey = getTodayKey();
 let calendarMonth = startOfMonth(parseDateKey(selectedDateKey));
 let currentView = "dashboard";
+let editingWeightDateKey = null;
 
 const elements = {
     headerDate: document.getElementById("headerDate"),
@@ -22,8 +24,11 @@ const elements = {
 
     dashboardView: document.getElementById("dashboardView"),
     calendarView: document.getElementById("calendarView"),
+    weightView: document.getElementById("weightView"),
+
     dashboardTab: document.getElementById("dashboardTab"),
     calendarTab: document.getElementById("calendarTab"),
+    weightTab: document.getElementById("weightTab"),
 
     summaryTitle: document.getElementById("summaryTitle"),
     selectedDateText: document.getElementById("selectedDateText"),
@@ -74,10 +79,25 @@ const elements = {
         document.getElementById("calendarCalories"),
     calendarProtein:
         document.getElementById("calendarProtein"),
-    calendarFoodCount:
-        document.getElementById("calendarFoodCount"),
+    calendarWeight:
+        document.getElementById("calendarWeight"),
     openSelectedDayButton:
         document.getElementById("openSelectedDayButton"),
+
+    currentWeight:
+        document.getElementById("currentWeight"),
+    currentWeightDate:
+        document.getElementById("currentWeightDate"),
+    weightDifference:
+        document.getElementById("weightDifference"),
+    lowestWeight:
+        document.getElementById("lowestWeight"),
+    highestWeight:
+        document.getElementById("highestWeight"),
+    weightHistoryList:
+        document.getElementById("weightHistoryList"),
+    weightEmptyState:
+        document.getElementById("weightEmptyState"),
 
     foodDialog: document.getElementById("foodDialog"),
     foodForm: document.getElementById("foodForm"),
@@ -93,7 +113,30 @@ const elements = {
     emptyAddButton:
         document.getElementById("emptyAddButton"),
     closeFoodDialog:
-        document.getElementById("closeFoodDialog")
+        document.getElementById("closeFoodDialog"),
+
+    weightDialog:
+        document.getElementById("weightDialog"),
+    weightForm:
+        document.getElementById("weightForm"),
+    weightDate:
+        document.getElementById("weightDate"),
+    weightValue:
+        document.getElementById("weightValue"),
+    weightFormError:
+        document.getElementById("weightFormError"),
+    weightDialogLabel:
+        document.getElementById("weightDialogLabel"),
+    weightDialogTitle:
+        document.getElementById("weightDialogTitle"),
+    closeWeightDialog:
+        document.getElementById("closeWeightDialog"),
+    openWeightDialog:
+        document.getElementById("openWeightDialog"),
+    openWeightDialogSecondary:
+        document.getElementById("openWeightDialogSecondary"),
+    weightEmptyAddButton:
+        document.getElementById("weightEmptyAddButton")
 };
 
 function padNumber(value) {
@@ -151,6 +194,14 @@ function isToday(dateKey) {
     return dateKey === getTodayKey();
 }
 
+function capitalizeFirstLetter(value) {
+    if (!value) {
+        return "";
+    }
+
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function formatDateLong(dateKey) {
     return new Intl.DateTimeFormat("de-DE", {
         weekday: "long",
@@ -168,14 +219,6 @@ function formatDateShort(dateKey) {
     }).format(parseDateKey(dateKey));
 }
 
-function capitalizeFirstLetter(value) {
-    if (!value) {
-        return "";
-    }
-
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 function createFoodId() {
     if (
         window.crypto &&
@@ -187,6 +230,10 @@ function createFoodId() {
     return `${Date.now()}-${Math.random()
         .toString(16)
         .slice(2)}`;
+}
+
+function isValidDateKey(dateKey) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateKey);
 }
 
 function isValidFood(food) {
@@ -217,6 +264,35 @@ function sanitizeFoods(foods) {
         }));
 }
 
+function sanitizeWeights(weightsByDate) {
+    if (
+        !weightsByDate ||
+        typeof weightsByDate !== "object"
+    ) {
+        return {};
+    }
+
+    const cleanedWeights = {};
+
+    Object.entries(weightsByDate).forEach(
+        ([dateKey, weight]) => {
+            const numericWeight = Number(weight);
+
+            if (
+                isValidDateKey(dateKey) &&
+                Number.isFinite(numericWeight) &&
+                numericWeight >= 20 &&
+                numericWeight <= 500
+            ) {
+                cleanedWeights[dateKey] =
+                    Math.round(numericWeight * 10) / 10;
+            }
+        }
+    );
+
+    return cleanedWeights;
+}
+
 function migrateOldData() {
     try {
         const oldValue = localStorage.getItem(
@@ -227,15 +303,32 @@ function migrateOldData() {
             return false;
         }
 
-        const oldFoods = sanitizeFoods(
-            JSON.parse(oldValue)
-        );
+        const oldData = JSON.parse(oldValue);
 
-        if (oldFoods.length === 0) {
+        if (
+            !oldData ||
+            typeof oldData !== "object"
+        ) {
             return false;
         }
 
-        appData.foodsByDate[getTodayKey()] = oldFoods;
+        const cleanedFoodsByDate = {};
+
+        Object.entries(
+            oldData.foodsByDate || {}
+        ).forEach(([dateKey, foods]) => {
+            const cleanedFoods = sanitizeFoods(foods);
+
+            if (cleanedFoods.length > 0) {
+                cleanedFoodsByDate[dateKey] =
+                    cleanedFoods;
+            }
+        });
+
+        appData = {
+            foodsByDate: cleanedFoodsByDate,
+            weightsByDate: {}
+        };
 
         localStorage.removeItem(OLD_STORAGE_KEY);
 
@@ -258,51 +351,46 @@ function loadData() {
 
         if (storedValue) {
             const parsedData = JSON.parse(storedValue);
+            const cleanedFoodsByDate = {};
 
-            if (
-                parsedData &&
-                typeof parsedData === "object" &&
-                parsedData.foodsByDate &&
-                typeof parsedData.foodsByDate === "object"
-            ) {
-                const cleanedFoodsByDate = {};
+            Object.entries(
+                parsedData.foodsByDate || {}
+            ).forEach(([dateKey, foods]) => {
+                const cleanedFoods = sanitizeFoods(foods);
 
-                Object.entries(
-                    parsedData.foodsByDate
-                ).forEach(([dateKey, foods]) => {
-                    const cleanedFoods = sanitizeFoods(foods);
+                if (cleanedFoods.length > 0) {
+                    cleanedFoodsByDate[dateKey] =
+                        cleanedFoods;
+                }
+            });
 
-                    if (cleanedFoods.length > 0) {
-                        cleanedFoodsByDate[dateKey] =
-                            cleanedFoods;
-                    }
-                });
+            appData = {
+                foodsByDate: cleanedFoodsByDate,
+                weightsByDate: sanitizeWeights(
+                    parsedData.weightsByDate
+                )
+            };
 
-                appData = {
-                    foodsByDate: cleanedFoodsByDate
-                };
-
-                return;
-            }
+            return;
         }
 
         appData = {
-            foodsByDate: {}
+            foodsByDate: {},
+            weightsByDate: {}
         };
 
-        const dataMigrated = migrateOldData();
-
-        if (dataMigrated) {
+        if (migrateOldData()) {
             saveData();
         }
     } catch (error) {
         console.error(
-            "Gespeicherte Daten konnten nicht geladen werden:",
+            "Daten konnten nicht geladen werden:",
             error
         );
 
         appData = {
-            foodsByDate: {}
+            foodsByDate: {},
+            weightsByDate: {}
         };
     }
 }
@@ -336,6 +424,23 @@ function setFoodsForDate(dateKey, foods) {
     appData.foodsByDate[dateKey] = foods;
 }
 
+function getWeightForDate(dateKey) {
+    const weight = appData.weightsByDate[dateKey];
+
+    return Number.isFinite(weight) ? weight : null;
+}
+
+function getSortedWeightEntries() {
+    return Object.entries(appData.weightsByDate)
+        .map(([dateKey, weight]) => ({
+            dateKey,
+            weight
+        }))
+        .sort((first, second) =>
+            second.dateKey.localeCompare(first.dateKey)
+        );
+}
+
 function calculateTotals(foods) {
     return foods.reduce(
         (totals, food) => {
@@ -365,7 +470,15 @@ function calculatePercentage(value, goal) {
 function formatProtein(value) {
     return Number.isInteger(value)
         ? value.toString()
-        : value.toFixed(1);
+        : value.toFixed(1).replace(".", ",");
+}
+
+function formatWeight(value) {
+    if (!Number.isFinite(value)) {
+        return "–";
+    }
+
+    return value.toFixed(1).replace(".", ",");
 }
 
 function updateDateLabels() {
@@ -478,7 +591,7 @@ function updateDashboard() {
 
     elements.proteinProgressTrack.setAttribute(
         "aria-valuenow",
-        formatProtein(totals.protein)
+        totals.protein.toString()
     );
 }
 
@@ -489,6 +602,15 @@ function createDeleteIcon() {
             <path d="M9 7V4h6v3"/>
             <path d="M7 7l1 13h8l1-13"/>
             <path d="M10 11v5M14 11v5"/>
+        </svg>
+    `;
+}
+
+function createEditIcon() {
+    return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10Z"/>
+            <path d="m14 7 3 3"/>
         </svg>
     `;
 }
@@ -546,6 +668,7 @@ function renderFoods() {
 function updateCalendarSummary() {
     const foods = getFoodsForDate(selectedDateKey);
     const totals = calculateTotals(foods);
+    const weight = getWeightForDate(selectedDateKey);
 
     elements.calendarSelectedDate.textContent =
         isToday(selectedDateKey)
@@ -560,8 +683,8 @@ function updateCalendarSummary() {
     elements.calendarProtein.textContent =
         formatProtein(totals.protein);
 
-    elements.calendarFoodCount.textContent =
-        foods.length;
+    elements.calendarWeight.textContent =
+        formatWeight(weight);
 }
 
 function getCalendarStartDate(monthDate) {
@@ -570,6 +693,7 @@ function getCalendarStartDate(monthDate) {
     const daysFromMonday = (weekday + 6) % 7;
 
     const calendarStart = new Date(firstDay);
+
     calendarStart.setDate(
         firstDay.getDate() - daysFromMonday
     );
@@ -593,6 +717,7 @@ function renderCalendar() {
 
     for (let index = 0; index < 42; index += 1) {
         const date = new Date(calendarStart);
+
         date.setDate(calendarStart.getDate() + index);
 
         const dateKey = createDateKey(date);
@@ -600,13 +725,16 @@ function renderCalendar() {
 
         button.type = "button";
         button.className = "calendar-day";
-        button.textContent = date.getDate();
         button.dataset.dateKey = dateKey;
 
-        const isOutsideMonth =
-            date.getMonth() !== calendarMonth.getMonth();
+        const dayNumber = document.createElement("span");
+        dayNumber.textContent = date.getDate();
 
-        if (isOutsideMonth) {
+        button.append(dayNumber);
+
+        if (
+            date.getMonth() !== calendarMonth.getMonth()
+        ) {
             button.classList.add("outside-month");
         }
 
@@ -618,8 +746,39 @@ function renderCalendar() {
             button.classList.add("selected");
         }
 
-        if (getFoodsForDate(dateKey).length > 0) {
-            button.classList.add("has-entries");
+        const hasFood =
+            getFoodsForDate(dateKey).length > 0;
+
+        const hasWeight =
+            getWeightForDate(dateKey) !== null;
+
+        if (hasFood || hasWeight) {
+            const markers =
+                document.createElement("span");
+
+            markers.className = "day-markers";
+
+            if (hasFood) {
+                const foodMarker =
+                    document.createElement("span");
+
+                foodMarker.className =
+                    "day-marker food";
+
+                markers.append(foodMarker);
+            }
+
+            if (hasWeight) {
+                const weightMarker =
+                    document.createElement("span");
+
+                weightMarker.className =
+                    "day-marker weight";
+
+                markers.append(weightMarker);
+            }
+
+            button.append(markers);
         }
 
         button.setAttribute(
@@ -633,45 +792,166 @@ function renderCalendar() {
     updateCalendarSummary();
 }
 
+function updateWeightDashboard() {
+    const entries = getSortedWeightEntries();
+
+    elements.weightHistoryList.innerHTML = "";
+
+    elements.weightEmptyState.classList.toggle(
+        "hidden",
+        entries.length > 0
+    );
+
+    if (entries.length === 0) {
+        elements.currentWeight.textContent = "–";
+        elements.currentWeightDate.textContent =
+            "Noch keine Gewichtsmessung vorhanden.";
+        elements.weightDifference.textContent = "–";
+        elements.lowestWeight.textContent = "–";
+        elements.highestWeight.textContent = "–";
+        return;
+    }
+
+    const latestEntry = entries[0];
+
+    elements.currentWeight.textContent =
+        formatWeight(latestEntry.weight);
+
+    elements.currentWeightDate.textContent =
+        `Letzte Messung: ${capitalizeFirstLetter(
+            formatDateLong(latestEntry.dateKey)
+        )}`;
+
+    const weights = entries.map(
+        (entry) => entry.weight
+    );
+
+    elements.lowestWeight.textContent =
+        `${formatWeight(Math.min(...weights))} kg`;
+
+    elements.highestWeight.textContent =
+        `${formatWeight(Math.max(...weights))} kg`;
+
+    if (entries.length >= 2) {
+        const difference =
+            latestEntry.weight - entries[1].weight;
+
+        const prefix = difference > 0 ? "+" : "";
+
+        elements.weightDifference.textContent =
+            `${prefix}${formatWeight(difference)} kg`;
+    } else {
+        elements.weightDifference.textContent = "–";
+    }
+
+    entries.forEach((entry) => {
+        const article = document.createElement("article");
+        article.className = "weight-history-item";
+
+        const information = document.createElement("div");
+        information.className =
+            "weight-history-information";
+
+        const title = document.createElement("h3");
+        title.textContent =
+            `${formatWeight(entry.weight)} kg`;
+
+        const date = document.createElement("p");
+        date.className = "weight-history-date";
+        date.textContent = capitalizeFirstLetter(
+            formatDateLong(entry.dateKey)
+        );
+
+        information.append(title, date);
+
+        const actions = document.createElement("div");
+        actions.className = "item-actions";
+
+        const editButton =
+            document.createElement("button");
+
+        editButton.type = "button";
+        editButton.className = "edit-button";
+        editButton.dataset.weightDate = entry.dateKey;
+        editButton.setAttribute(
+            "aria-label",
+            `Gewicht vom ${formatDateLong(
+                entry.dateKey
+            )} bearbeiten`
+        );
+        editButton.innerHTML = createEditIcon();
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.dataset.weightDate = entry.dateKey;
+        deleteButton.setAttribute(
+            "aria-label",
+            `Gewicht vom ${formatDateLong(
+                entry.dateKey
+            )} löschen`
+        );
+        deleteButton.innerHTML = createDeleteIcon();
+
+        actions.append(editButton, deleteButton);
+        article.append(information, actions);
+        elements.weightHistoryList.append(article);
+    });
+}
+
 function renderApp() {
     updateDateLabels();
     renderFoods();
     updateDashboard();
     renderCalendar();
+    updateWeightDashboard();
 }
 
 function switchView(viewName) {
     currentView = viewName;
 
-    const showDashboard =
-        viewName === "dashboard";
-
     elements.dashboardView.classList.toggle(
         "active",
-        showDashboard
+        viewName === "dashboard"
     );
 
     elements.calendarView.classList.toggle(
         "active",
-        !showDashboard
+        viewName === "calendar"
+    );
+
+    elements.weightView.classList.toggle(
+        "active",
+        viewName === "weight"
     );
 
     elements.dashboardTab.classList.toggle(
         "active",
-        showDashboard
+        viewName === "dashboard"
     );
 
     elements.calendarTab.classList.toggle(
         "active",
-        !showDashboard
+        viewName === "calendar"
     );
 
-    if (!showDashboard) {
+    elements.weightTab.classList.toggle(
+        "active",
+        viewName === "weight"
+    );
+
+    if (viewName === "calendar") {
         calendarMonth = startOfMonth(
             parseDateKey(selectedDateKey)
         );
 
         renderCalendar();
+    }
+
+    if (viewName === "weight") {
+        updateWeightDashboard();
     }
 
     window.scrollTo({
@@ -693,7 +973,7 @@ function selectDate(dateKey, openDashboard = false) {
     }
 }
 
-function openDialog() {
+function openFoodDialog() {
     elements.formError.textContent = "";
     updateDateLabels();
 
@@ -711,7 +991,7 @@ function openDialog() {
     }, 100);
 }
 
-function closeDialog() {
+function closeFoodDialog() {
     if (elements.foodDialog.open) {
         elements.foodDialog.close();
     }
@@ -779,7 +1059,7 @@ function addFood(event) {
     setFoodsForDate(selectedDateKey, foods);
 
     saveData();
-    closeDialog();
+    closeFoodDialog();
     renderApp();
 }
 
@@ -804,6 +1084,143 @@ function handleFoodListClick(event) {
     }
 
     deleteFood(deleteButton.dataset.foodId);
+}
+
+function openWeightDialog(dateKey = getTodayKey()) {
+    editingWeightDateKey = null;
+
+    elements.weightForm.reset();
+    elements.weightFormError.textContent = "";
+    elements.weightDialogLabel.textContent =
+        "Neue Messung";
+    elements.weightDialogTitle.textContent =
+        "Gewicht eintragen";
+    elements.weightDate.value = dateKey;
+
+    if (
+        typeof elements.weightDialog.showModal ===
+        "function"
+    ) {
+        elements.weightDialog.showModal();
+    } else {
+        elements.weightDialog.setAttribute("open", "");
+    }
+
+    window.setTimeout(() => {
+        elements.weightValue.focus();
+    }, 100);
+}
+
+function openWeightEditDialog(dateKey) {
+    const weight = getWeightForDate(dateKey);
+
+    if (weight === null) {
+        return;
+    }
+
+    editingWeightDateKey = dateKey;
+
+    elements.weightForm.reset();
+    elements.weightFormError.textContent = "";
+    elements.weightDialogLabel.textContent =
+        "Messung bearbeiten";
+    elements.weightDialogTitle.textContent =
+        "Gewicht ändern";
+    elements.weightDate.value = dateKey;
+    elements.weightValue.value = weight;
+
+    if (
+        typeof elements.weightDialog.showModal ===
+        "function"
+    ) {
+        elements.weightDialog.showModal();
+    } else {
+        elements.weightDialog.setAttribute("open", "");
+    }
+
+    window.setTimeout(() => {
+        elements.weightValue.focus();
+        elements.weightValue.select();
+    }, 100);
+}
+
+function closeWeightDialog() {
+    if (elements.weightDialog.open) {
+        elements.weightDialog.close();
+    }
+
+    editingWeightDateKey = null;
+    elements.weightForm.reset();
+    elements.weightFormError.textContent = "";
+}
+
+function saveWeight(event) {
+    event.preventDefault();
+
+    const dateKey = elements.weightDate.value;
+    const weight = Number(elements.weightValue.value);
+
+    if (!isValidDateKey(dateKey)) {
+        elements.weightFormError.textContent =
+            "Bitte wähle ein gültiges Datum.";
+        return;
+    }
+
+    if (
+        !Number.isFinite(weight) ||
+        weight < 20 ||
+        weight > 500
+    ) {
+        elements.weightFormError.textContent =
+            "Bitte gib ein Gewicht zwischen 20 und 500 kg ein.";
+        return;
+    }
+
+    if (
+        editingWeightDateKey &&
+        editingWeightDateKey !== dateKey
+    ) {
+        delete appData.weightsByDate[
+            editingWeightDateKey
+        ];
+    }
+
+    appData.weightsByDate[dateKey] =
+        Math.round(weight * 10) / 10;
+
+    saveData();
+    closeWeightDialog();
+    renderApp();
+}
+
+function deleteWeight(dateKey) {
+    delete appData.weightsByDate[dateKey];
+
+    saveData();
+    renderApp();
+}
+
+function handleWeightHistoryClick(event) {
+    const editButton = event.target.closest(
+        ".edit-button"
+    );
+
+    if (editButton) {
+        openWeightEditDialog(
+            editButton.dataset.weightDate
+        );
+        return;
+    }
+
+    const deleteButton = event.target.closest(
+        ".delete-button"
+    );
+
+    if (deleteButton) {
+        deleteWeight(
+            deleteButton.dataset.weightDate
+        );
+    }
 }
 
 function handleCalendarClick(event) {
@@ -852,6 +1269,11 @@ elements.dashboardTab.addEventListener(
 elements.calendarTab.addEventListener(
     "click",
     () => switchView("calendar")
+);
+
+elements.weightTab.addEventListener(
+    "click",
+    () => switchView("weight")
 );
 
 elements.openCalendarButton.addEventListener(
@@ -905,17 +1327,17 @@ elements.calendarGrid.addEventListener(
 
 elements.openFoodDialog.addEventListener(
     "click",
-    openDialog
+    openFoodDialog
 );
 
 elements.emptyAddButton.addEventListener(
     "click",
-    openDialog
+    openFoodDialog
 );
 
 elements.closeFoodDialog.addEventListener(
     "click",
-    closeDialog
+    closeFoodDialog
 );
 
 elements.foodForm.addEventListener(
@@ -932,7 +1354,46 @@ elements.foodDialog.addEventListener(
     "click",
     (event) => {
         if (event.target === elements.foodDialog) {
-            closeDialog();
+            closeFoodDialog();
+        }
+    }
+);
+
+elements.openWeightDialog.addEventListener(
+    "click",
+    () => openWeightDialog(getTodayKey())
+);
+
+elements.openWeightDialogSecondary.addEventListener(
+    "click",
+    () => openWeightDialog(getTodayKey())
+);
+
+elements.weightEmptyAddButton.addEventListener(
+    "click",
+    () => openWeightDialog(getTodayKey())
+);
+
+elements.closeWeightDialog.addEventListener(
+    "click",
+    closeWeightDialog
+);
+
+elements.weightForm.addEventListener(
+    "submit",
+    saveWeight
+);
+
+elements.weightHistoryList.addEventListener(
+    "click",
+    handleWeightHistoryClick
+);
+
+elements.weightDialog.addEventListener(
+    "click",
+    (event) => {
+        if (event.target === elements.weightDialog) {
+            closeWeightDialog();
         }
     }
 );
