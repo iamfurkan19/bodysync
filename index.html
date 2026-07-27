@@ -2,7 +2,11 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
     <title>BodySync</title>
 
     <link rel="stylesheet" href="style.css">
@@ -10,21 +14,106 @@
 
 <body>
 
-<div class="container">
+<div class="app">
 
-    <div class="card">
-
-        <h1>BodySync</h1>
-
-        <p class="subtitle">
-            Dein persönlicher Ernährungs- und Gewichtstracker
-        </p>
-
-        <div class="status">
-            ✅ BodySync läuft erfolgreich
+    <header class="app-header">
+        <div>
+            <p class="eyebrow">Heute</p>
+            <h1>BodySync</h1>
         </div>
 
-    </div>
+        <div class="avatar">BS</div>
+    </header>
+
+    <main class="content">
+
+        <section class="welcome-card">
+            <p class="eyebrow light">Tagesziel</p>
+            <h2>Bleib heute im Rhythmus</h2>
+            <p>
+                Erfasse deine Mahlzeiten und behalte Kalorien,
+                Protein und Gewicht im Blick.
+            </p>
+        </section>
+
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <span class="stat-label">Kalorien</span>
+                <strong id="caloriesValue">0 / 2000</strong>
+                <span class="stat-unit">kcal</span>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        id="caloriesProgress"
+                    ></div>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <span class="stat-label">Protein</span>
+                <strong id="proteinValue">0 / 160</strong>
+                <span class="stat-unit">g</span>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        id="proteinProgress"
+                    ></div>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Ernährung</p>
+                    <h2>Heute gegessen</h2>
+                </div>
+
+                <button class="add-button" type="button">
+                    Hinzufügen
+                </button>
+            </div>
+
+            <div class="empty-state">
+                <h3>Noch keine Einträge</h3>
+                <p>
+                    Deine Lebensmittel erscheinen später an dieser Stelle.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="tab-bar">
+        <button class="tab active" type="button">
+            <span class="tab-icon">⌂</span>
+            <span>Start</span>
+        </button>
+
+        <button class="tab" type="button">
+            <span class="tab-icon">＋</span>
+            <span>Essen</span>
+        </button>
+
+        <button class="tab" type="button">
+            <span class="tab-icon">□</span>
+            <span>Kalender</span>
+        </button>
+
+        <button class="tab" type="button">
+            <span class="tab-icon">↗</span>
+            <span>Gewicht</span>
+        </button>
+
+        <button class="tab" type="button">
+            <span class="tab-icon">⚙</span>
+            <span>Optionen</span>
+        </button>
+    </nav>
 
 </div>
 
