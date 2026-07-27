@@ -2,122 +2,296 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
+    <meta name="theme-color" content="#315c4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BodySync">
+
     <title>BodySync</title>
 
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <div class="app-shell">
 
-<div class="app">
+        <header class="app-header">
+            <div>
+                <p class="eyebrow" id="currentDate">Heute</p>
+                <h1>BodySync</h1>
+            </div>
 
-    <header class="app-header">
-        <div>
-            <p class="eyebrow">Heute</p>
-            <h1>BodySync</h1>
-        </div>
+            <div class="profile-badge" aria-label="BodySync">
+                BS
+            </div>
+        </header>
 
-        <div class="avatar">BS</div>
-    </header>
+        <main class="main-content">
 
-    <main class="content">
+            <section class="summary-card">
+                <p class="summary-label">Tagesübersicht</p>
+                <h2>Bleib heute im Rhythmus</h2>
 
-        <section class="welcome-card">
-            <p class="eyebrow light">Tagesziel</p>
-            <h2>Bleib heute im Rhythmus</h2>
-            <p>
-                Erfasse deine Mahlzeiten und behalte Kalorien,
-                Protein und Gewicht im Blick.
-            </p>
-        </section>
+                <p class="summary-text">
+                    Erfasse deine Lebensmittel und behalte Kalorien
+                    und Protein im Blick.
+                </p>
+            </section>
 
-        <section class="stats-grid">
+            <section class="stats-grid">
 
-            <article class="stat-card">
-                <span class="stat-label">Kalorien</span>
-                <strong id="caloriesValue">0 / 2000</strong>
-                <span class="stat-unit">kcal</span>
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Kalorien</span>
+                        <span id="caloriesPercentage">0 %</span>
+                    </div>
 
-                <div class="progress">
+                    <div class="stat-value">
+                        <strong id="caloriesConsumed">0</strong>
+                        <span>/ 2000 kcal</span>
+                    </div>
+
                     <div
-                        class="progress-bar"
-                        id="caloriesProgress"
-                    ></div>
-                </div>
-            </article>
+                        class="progress-track"
+                        role="progressbar"
+                        aria-label="Kalorienfortschritt"
+                        aria-valuemin="0"
+                        aria-valuemax="2000"
+                        aria-valuenow="0"
+                        id="caloriesProgressTrack"
+                    >
+                        <div
+                            class="progress-fill"
+                            id="caloriesProgress"
+                        ></div>
+                    </div>
 
-            <article class="stat-card">
-                <span class="stat-label">Protein</span>
-                <strong id="proteinValue">0 / 160</strong>
-                <span class="stat-unit">g</span>
+                    <p class="remaining-text" id="caloriesRemaining">
+                        Noch 2000 kcal verfügbar
+                    </p>
+                </article>
 
-                <div class="progress">
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Protein</span>
+                        <span id="proteinPercentage">0 %</span>
+                    </div>
+
+                    <div class="stat-value">
+                        <strong id="proteinConsumed">0</strong>
+                        <span>/ 160 g</span>
+                    </div>
+
                     <div
-                        class="progress-bar"
-                        id="proteinProgress"
-                    ></div>
+                        class="progress-track"
+                        role="progressbar"
+                        aria-label="Proteinfortschritt"
+                        aria-valuemin="0"
+                        aria-valuemax="160"
+                        aria-valuenow="0"
+                        id="proteinProgressTrack"
+                    >
+                        <div
+                            class="progress-fill"
+                            id="proteinProgress"
+                        ></div>
+                    </div>
+
+                    <p class="remaining-text" id="proteinRemaining">
+                        Noch 160 g verfügbar
+                    </p>
+                </article>
+
+            </section>
+
+            <section class="food-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">Ernährung</p>
+                        <h2>Heute gegessen</h2>
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="openFoodDialog"
+                        type="button"
+                    >
+                        Hinzufügen
+                    </button>
                 </div>
-            </article>
 
-        </section>
+                <div class="food-list" id="foodList"></div>
 
-        <section class="section-block">
-            <div class="section-heading">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M7 3v7M10 3v7M7 7h3M8.5 10v11M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"
+                            />
+                        </svg>
+                    </div>
+
+                    <h3>Noch keine Einträge</h3>
+
+                    <p>
+                        Füge dein erstes Lebensmittel hinzu.
+                    </p>
+
+                    <button
+                        class="secondary-button"
+                        id="emptyAddButton"
+                        type="button"
+                    >
+                        Lebensmittel hinzufügen
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="tab-bar" aria-label="Hauptnavigation">
+
+            <button class="tab-button active" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 11.5 12 4l9 7.5"/>
+                    <path d="M5.5 10.5V20h13v-9.5"/>
+                    <path d="M9.5 20v-6h5v6"/>
+                </svg>
+                <span>Start</span>
+            </button>
+
+            <button class="tab-button" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>Essen</span>
+            </button>
+
+            <button class="tab-button" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="16" rx="2"/>
+                    <path d="M7 3v4M17 3v4M3 10h18"/>
+                </svg>
+                <span>Kalender</span>
+            </button>
+
+            <button class="tab-button" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 19h14"/>
+                    <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
+                    <path d="M9 8h6"/>
+                </svg>
+                <span>Gewicht</span>
+            </button>
+
+            <button class="tab-button" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.6.8 1 1 .3.2.7.3 1.1.3h.1v4h-.1c-.4 0-.8.1-1.1.3-.4.2-.8.6-1 1Z"
+                    />
+                </svg>
+                <span>Optionen</span>
+            </button>
+
+        </nav>
+    </div>
+
+    <dialog class="food-dialog" id="foodDialog">
+        <form class="food-form" id="foodForm">
+
+            <div class="dialog-header">
                 <div>
-                    <p class="eyebrow">Ernährung</p>
-                    <h2>Heute gegessen</h2>
+                    <p class="eyebrow">Neuer Eintrag</p>
+                    <h2>Lebensmittel hinzufügen</h2>
                 </div>
 
-                <button class="add-button" type="button">
-                    Hinzufügen
+                <button
+                    class="icon-button"
+                    id="closeFoodDialog"
+                    type="button"
+                    aria-label="Fenster schließen"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m6 6 12 12M18 6 6 18"/>
+                    </svg>
                 </button>
             </div>
 
-            <div class="empty-state">
-                <h3>Noch keine Einträge</h3>
-                <p>
-                    Deine Lebensmittel erscheinen später an dieser Stelle.
-                </p>
+            <label class="form-field">
+                <span>Lebensmittel</span>
+
+                <input
+                    id="foodName"
+                    name="foodName"
+                    type="text"
+                    placeholder="Zum Beispiel Protein Kaffee"
+                    maxlength="80"
+                    autocomplete="off"
+                    required
+                >
+            </label>
+
+            <div class="form-grid">
+
+                <label class="form-field">
+                    <span>Kalorien</span>
+
+                    <div class="input-with-unit">
+                        <input
+                            id="foodCalories"
+                            name="foodCalories"
+                            type="number"
+                            placeholder="0"
+                            min="0"
+                            max="10000"
+                            step="1"
+                            inputmode="numeric"
+                            required
+                        >
+                        <span>kcal</span>
+                    </div>
+                </label>
+
+                <label class="form-field">
+                    <span>Protein</span>
+
+                    <div class="input-with-unit">
+                        <input
+                            id="foodProtein"
+                            name="foodProtein"
+                            type="number"
+                            placeholder="0"
+                            min="0"
+                            max="1000"
+                            step="0.1"
+                            inputmode="decimal"
+                            required
+                        >
+                        <span>g</span>
+                    </div>
+                </label>
+
             </div>
-        </section>
 
-    </main>
+            <p class="form-error" id="formError" role="alert"></p>
 
-    <nav class="tab-bar">
-        <button class="tab active" type="button">
-            <span class="tab-icon">⌂</span>
-            <span>Start</span>
-        </button>
+            <button class="submit-button" type="submit">
+                Eintrag speichern
+            </button>
 
-        <button class="tab" type="button">
-            <span class="tab-icon">＋</span>
-            <span>Essen</span>
-        </button>
+        </form>
+    </dialog>
 
-        <button class="tab" type="button">
-            <span class="tab-icon">□</span>
-            <span>Kalender</span>
-        </button>
-
-        <button class="tab" type="button">
-            <span class="tab-icon">↗</span>
-            <span>Gewicht</span>
-        </button>
-
-        <button class="tab" type="button">
-            <span class="tab-icon">⚙</span>
-            <span>Optionen</span>
-        </button>
-    </nav>
-
-</div>
-
-<script src="app.js"></script>
-
+    <script src="app.js"></script>
 </body>
 </html>
