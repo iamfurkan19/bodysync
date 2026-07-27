@@ -123,7 +123,8 @@ button:disabled {
 }
 
 .summary-card,
-.weight-hero-card {
+.weight-hero-card,
+.settings-hero-card {
     padding: 27px;
     border-radius: 28px;
     color: #ffffff;
@@ -131,33 +132,36 @@ button:disabled {
 }
 
 .summary-card {
-    background:
-        linear-gradient(
-            145deg,
-            #315c4b,
-            #244638
-        );
+    background: linear-gradient(145deg, #315c4b, #244638);
 }
 
 .weight-hero-card {
-    background:
-        linear-gradient(
-            145deg,
-            #5970a8,
-            #3f527e
-        );
+    background: linear-gradient(145deg, #5970a8, #3f527e);
 }
 
-.summary-topline {
+.settings-hero-card {
+    background: linear-gradient(145deg, #4f655e, #30443d);
+}
+
+.settings-hero-card h2 {
+    margin: 18px 0 10px;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: -0.9px;
+}
+
+.summary-topline,
+.section-header,
+.calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
+    gap: 16px;
 }
 
 .summary-label {
     margin: 0;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.72);
     font-size: 12px;
     font-weight: 750;
     letter-spacing: 0.1em;
@@ -176,7 +180,6 @@ button:disabled {
 }
 
 .summary-card h2 {
-    max-width: 360px;
     margin: 17px 0 11px;
     font-size: 29px;
     line-height: 1.08;
@@ -184,7 +187,6 @@ button:disabled {
 }
 
 .summary-text {
-    max-width: 400px;
     margin: 0;
     color: rgba(255, 255, 255, 0.8);
     font-size: 15px;
@@ -209,7 +211,6 @@ button:disabled {
 
 .stat-heading {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 8px;
     color: var(--text-soft);
@@ -263,10 +264,7 @@ button:disabled {
     line-height: 1.4;
 }
 
-.food-section,
-.calendar-card,
-.calendar-summary-card,
-.weight-history-card {
+.content-card {
     padding: 22px;
     border: 1px solid rgba(20, 30, 26, 0.04);
     border-radius: 27px;
@@ -274,17 +272,9 @@ button:disabled {
     box-shadow: var(--shadow);
 }
 
-.section-header,
-.calendar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
 .section-header h2,
 .calendar-header h2,
-.calendar-summary-card h2 {
+.card-title {
     margin: 5px 0 0;
     font-size: 24px;
     line-height: 1.1;
@@ -295,7 +285,7 @@ button:disabled {
 .secondary-button,
 .submit-button,
 .primary-wide-button,
-.today-wide-button {
+.secondary-wide-button {
     border: 0;
     cursor: pointer;
     font-weight: 750;
@@ -308,21 +298,40 @@ button:disabled {
     color: #ffffff;
 }
 
-.primary-button:active,
-.submit-button:active,
-.primary-wide-button:active {
-    transform: translateY(1px);
+.secondary-button {
+    padding: 11px 15px;
+    border-radius: 14px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
 }
 
-.food-list,
-.weight-history-list {
+.primary-wide-button,
+.secondary-wide-button,
+.submit-button {
+    width: 100%;
+    min-height: 50px;
+    border-radius: 16px;
+}
+
+.primary-wide-button,
+.submit-button {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.secondary-wide-button {
+    margin-top: 18px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+}
+
+.item-list {
     display: grid;
     gap: 11px;
     margin-top: 20px;
 }
 
-.food-item,
-.weight-history-item {
+.list-item {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -333,13 +342,11 @@ button:disabled {
     background: var(--surface-soft);
 }
 
-.food-information,
-.weight-history-information {
+.item-information {
     min-width: 0;
 }
 
-.food-information h3,
-.weight-history-information h3 {
+.item-information h3 {
     overflow: hidden;
     margin: 0;
     font-size: 16px;
@@ -348,8 +355,7 @@ button:disabled {
     white-space: nowrap;
 }
 
-.food-nutrition,
-.weight-history-date {
+.item-details {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 12px;
@@ -385,9 +391,11 @@ button:disabled {
 }
 
 .edit-button svg,
-.delete-button svg {
-    width: 19px;
-    height: 19px;
+.delete-button svg,
+.empty-icon svg,
+.calendar-arrow svg,
+.icon-button svg,
+.tab-button svg {
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -395,9 +403,10 @@ button:disabled {
     stroke-linejoin: round;
 }
 
-.edit-button:active,
-.delete-button:active {
-    transform: scale(0.96);
+.edit-button svg,
+.delete-button svg {
+    width: 19px;
+    height: 19px;
 }
 
 .empty-state {
@@ -424,14 +433,14 @@ button:disabled {
     color: var(--primary);
 }
 
+.weight-empty-icon {
+    background: var(--weight-soft);
+    color: var(--weight);
+}
+
 .empty-icon svg {
     width: 25px;
     height: 25px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
 
 .empty-state h3 {
@@ -444,13 +453,6 @@ button:disabled {
     color: var(--text-soft);
     font-size: 14px;
     line-height: 1.45;
-}
-
-.secondary-button {
-    padding: 11px 15px;
-    border-radius: 14px;
-    background: var(--primary-soft);
-    color: var(--primary-dark);
 }
 
 .calendar-controls {
@@ -466,18 +468,12 @@ button:disabled {
     border: 1px solid var(--border);
     border-radius: 13px;
     background: var(--surface-soft);
-    color: var(--text);
     cursor: pointer;
 }
 
 .calendar-arrow svg {
     width: 19px;
     height: 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
 
 .weekday-grid,
@@ -514,10 +510,6 @@ button:disabled {
     cursor: pointer;
 }
 
-.calendar-day:hover {
-    background: var(--surface-soft);
-}
-
 .calendar-day.outside-month {
     color: #b9bdc1;
 }
@@ -538,16 +530,27 @@ button:disabled {
     gap: 3px;
 }
 
-.day-marker {
-    width: 4px;
-    height: 4px;
+.day-marker,
+.legend-dot {
     border-radius: 50%;
 }
 
+.day-marker {
+    width: 4px;
+    height: 4px;
+}
+
+.legend-dot {
+    width: 7px;
+    height: 7px;
+}
+
+.food-dot,
 .day-marker.food {
     background: var(--primary);
 }
 
+.weight-dot,
 .day-marker.weight {
     background: var(--weight);
 }
@@ -571,37 +574,11 @@ button:disabled {
     font-size: 12px;
 }
 
-.legend-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-}
-
-.food-dot {
-    background: var(--primary);
-}
-
-.weight-dot {
-    background: var(--weight);
-}
-
-.today-wide-button {
-    width: 100%;
-    min-height: 46px;
-    margin-top: 18px;
-    border-radius: 15px;
-    background: var(--primary-soft);
-    color: var(--primary-dark);
-}
-
-.calendar-summary-card h2 {
-    margin-bottom: 20px;
-}
-
 .calendar-summary-values {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
+    margin-top: 20px;
 }
 
 .calendar-summary-values div {
@@ -614,10 +591,7 @@ button:disabled {
 
 .calendar-summary-values strong {
     display: block;
-    overflow: hidden;
     font-size: 21px;
-    letter-spacing: -0.5px;
-    text-overflow: ellipsis;
 }
 
 .calendar-summary-values span {
@@ -625,16 +599,6 @@ button:disabled {
     margin-top: 4px;
     color: var(--text-soft);
     font-size: 10px;
-    line-height: 1.25;
-}
-
-.primary-wide-button {
-    width: 100%;
-    min-height: 50px;
-    margin-top: 18px;
-    border-radius: 16px;
-    background: var(--primary);
-    color: #ffffff;
 }
 
 .weight-main-value {
@@ -658,12 +622,12 @@ button:disabled {
 
 .weight-stat-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
 
 .weight-stat-card {
-    padding: 16px 12px;
+    padding: 17px;
 }
 
 .weight-stat-card > span {
@@ -677,15 +641,93 @@ button:disabled {
     display: block;
     margin-top: 9px;
     font-size: 20px;
-    letter-spacing: -0.5px;
 }
 
 .weight-stat-card small {
     display: block;
     margin-top: 5px;
     color: var(--text-soft);
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1.3;
+}
+
+.settings-form {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.form-field {
+    display: grid;
+    gap: 8px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-field input {
+    width: 100%;
+    height: 52px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    outline: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    font-size: 16px;
+}
+
+.form-field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 92, 75, 0.12);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 17px;
+}
+
+.input-with-unit {
+    position: relative;
+}
+
+.input-with-unit input {
+    padding-right: 60px;
+}
+
+.input-with-unit > span {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: var(--text-soft);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.form-error,
+.form-success {
+    min-height: 19px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.form-error {
+    color: var(--danger);
+}
+
+.form-success {
+    color: var(--primary);
+}
+
+.information-card p:last-child {
+    margin: 14px 0 0;
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.55;
 }
 
 .tab-bar {
@@ -723,11 +765,6 @@ button:disabled {
 .tab-button svg {
     width: 22px;
     height: 22px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
 
 .tab-button.active {
@@ -774,8 +811,6 @@ button:disabled {
 .dialog-header h2 {
     margin: 5px 0 0;
     font-size: 24px;
-    line-height: 1.15;
-    letter-spacing: -0.7px;
 }
 
 .icon-button {
@@ -787,91 +822,20 @@ button:disabled {
     border: 0;
     border-radius: 14px;
     background: var(--surface-soft);
-    color: var(--text);
     cursor: pointer;
 }
 
 .icon-button svg {
     width: 20px;
     height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
 }
 
-.form-field {
-    display: grid;
-    gap: 8px;
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.form-field input {
-    width: 100%;
-    min-width: 0;
-    height: 52px;
-    padding: 0 15px;
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    outline: none;
-    background: var(--surface-soft);
-    color: var(--text);
-    font-size: 16px;
-}
-
-.form-field input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(49, 92, 75, 0.12);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+.dialog-form > .form-field + .form-field {
     margin-top: 17px;
 }
 
-.weight-input-field {
-    margin-top: 17px;
-}
-
-.input-with-unit {
-    position: relative;
-}
-
-.input-with-unit input {
-    padding-right: 52px;
-}
-
-.input-with-unit > span {
-    position: absolute;
-    top: 50%;
-    right: 14px;
-    transform: translateY(-50%);
-    color: var(--text-soft);
-    font-size: 13px;
-    font-weight: 600;
-    pointer-events: none;
-}
-
-.form-error {
-    min-height: 19px;
-    margin: 13px 0 0;
-    color: var(--danger);
-    font-size: 13px;
-    line-height: 1.45;
-}
-
-.submit-button {
-    width: 100%;
-    min-height: 52px;
+.dialog-form .submit-button {
     margin-top: 5px;
-    border-radius: 16px;
-    background: var(--primary);
-    color: #ffffff;
-    font-size: 15px;
 }
 
 @media (max-width: 390px) {
@@ -880,25 +844,15 @@ button:disabled {
         padding-right: 14px;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-grid {
+    .stats-grid,
+    .form-grid,
+    .weight-stat-grid {
         grid-template-columns: 1fr;
     }
 
     .calendar-day {
         border-radius: 10px;
         font-size: 12px;
-    }
-
-    .weight-stat-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .weight-stat-card {
-        padding: 16px;
     }
 }
 
