@@ -197,7 +197,7 @@
                         <div>
                             <p class="eyebrow">Verlauf</p>
                             <h2 id="calendarMonthTitle">
-                                Juli 2026
+                                Monat
                             </h2>
                         </div>
 
@@ -241,9 +241,16 @@
                         id="calendarGrid"
                     ></div>
 
-                    <div class="calendar-legend">
-                        <span class="legend-dot"></span>
-                        <span>Tag mit Ernährungseinträgen</span>
+                    <div class="calendar-legends">
+                        <div class="calendar-legend">
+                            <span class="legend-dot food-dot"></span>
+                            <span>Ernährung</span>
+                        </div>
+
+                        <div class="calendar-legend">
+                            <span class="legend-dot weight-dot"></span>
+                            <span>Gewicht</span>
+                        </div>
                     </div>
 
                     <button
@@ -274,8 +281,8 @@
                         </div>
 
                         <div>
-                            <strong id="calendarFoodCount">0</strong>
-                            <span>Einträge</span>
+                            <strong id="calendarWeight">–</strong>
+                            <span>kg Gewicht</span>
                         </div>
                     </div>
 
@@ -290,6 +297,106 @@
 
             </div>
 
+            <!-- GEWICHT -->
+
+            <div class="app-view" id="weightView">
+
+                <section class="weight-hero-card">
+                    <div class="summary-topline">
+                        <p class="summary-label">Gewicht</p>
+
+                        <button
+                            class="summary-date-button"
+                            id="openWeightDialog"
+                            type="button"
+                        >
+                            Eintragen
+                        </button>
+                    </div>
+
+                    <div class="weight-main-value">
+                        <strong id="currentWeight">–</strong>
+                        <span>kg</span>
+                    </div>
+
+                    <p class="summary-text" id="currentWeightDate">
+                        Noch keine Gewichtsmessung vorhanden.
+                    </p>
+                </section>
+
+                <section class="weight-stat-grid">
+
+                    <article class="weight-stat-card">
+                        <span>Veränderung</span>
+                        <strong id="weightDifference">–</strong>
+                        <small>zum vorherigen Eintrag</small>
+                    </article>
+
+                    <article class="weight-stat-card">
+                        <span>Niedrigster Wert</span>
+                        <strong id="lowestWeight">–</strong>
+                        <small>gesamter Verlauf</small>
+                    </article>
+
+                    <article class="weight-stat-card">
+                        <span>Höchster Wert</span>
+                        <strong id="highestWeight">–</strong>
+                        <small>gesamter Verlauf</small>
+                    </article>
+                </section>
+
+                <section class="weight-history-card">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Messungen</p>
+                            <h2>Gewichtsverlauf</h2>
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            id="openWeightDialogSecondary"
+                            type="button"
+                        >
+                            Hinzufügen
+                        </button>
+                    </div>
+
+                    <div
+                        class="weight-history-list"
+                        id="weightHistoryList"
+                    ></div>
+
+                    <div
+                        class="empty-state"
+                        id="weightEmptyState"
+                    >
+                        <div class="empty-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 19h14"/>
+                                <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
+                                <path d="M9 8h6"/>
+                            </svg>
+                        </div>
+
+                        <h3>Noch keine Messung</h3>
+
+                        <p>
+                            Trage dein aktuelles Gewicht ein,
+                            um deinen Verlauf zu starten.
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            id="weightEmptyAddButton"
+                            type="button"
+                        >
+                            Gewicht eintragen
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+
         </main>
 
         <nav class="tab-bar" aria-label="Hauptnavigation">
@@ -298,7 +405,6 @@
                 class="tab-button active"
                 id="dashboardTab"
                 type="button"
-                data-view="dashboard"
             >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M3 11.5 12 4l9 7.5"/>
@@ -319,7 +425,6 @@
                 class="tab-button"
                 id="calendarTab"
                 type="button"
-                data-view="calendar"
             >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="16" rx="2"/>
@@ -328,7 +433,11 @@
                 <span>Kalender</span>
             </button>
 
-            <button class="tab-button" type="button" disabled>
+            <button
+                class="tab-button"
+                id="weightTab"
+                type="button"
+            >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 19h14"/>
                     <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
@@ -350,8 +459,10 @@
         </nav>
     </div>
 
-    <dialog class="food-dialog" id="foodDialog">
-        <form class="food-form" id="foodForm">
+    <!-- LEBENSMITTEL-DIALOG -->
+
+    <dialog class="app-dialog" id="foodDialog">
+        <form class="dialog-form" id="foodForm">
 
             <div class="dialog-header">
                 <div>
@@ -379,7 +490,6 @@
 
                 <input
                     id="foodName"
-                    name="foodName"
                     type="text"
                     placeholder="Zum Beispiel Protein Kaffee"
                     maxlength="80"
@@ -396,7 +506,6 @@
                     <div class="input-with-unit">
                         <input
                             id="foodCalories"
-                            name="foodCalories"
                             type="number"
                             placeholder="0"
                             min="0"
@@ -415,7 +524,6 @@
                     <div class="input-with-unit">
                         <input
                             id="foodProtein"
-                            name="foodProtein"
                             type="number"
                             placeholder="0"
                             min="0"
@@ -434,6 +542,75 @@
 
             <button class="submit-button" type="submit">
                 Eintrag speichern
+            </button>
+
+        </form>
+    </dialog>
+
+    <!-- GEWICHTS-DIALOG -->
+
+    <dialog class="app-dialog" id="weightDialog">
+        <form class="dialog-form" id="weightForm">
+
+            <div class="dialog-header">
+                <div>
+                    <p class="eyebrow" id="weightDialogLabel">
+                        Neue Messung
+                    </p>
+
+                    <h2 id="weightDialogTitle">
+                        Gewicht eintragen
+                    </h2>
+                </div>
+
+                <button
+                    class="icon-button"
+                    id="closeWeightDialog"
+                    type="button"
+                    aria-label="Fenster schließen"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m6 6 12 12M18 6 6 18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <label class="form-field">
+                <span>Datum</span>
+
+                <input
+                    id="weightDate"
+                    type="date"
+                    required
+                >
+            </label>
+
+            <label class="form-field weight-input-field">
+                <span>Gewicht</span>
+
+                <div class="input-with-unit">
+                    <input
+                        id="weightValue"
+                        type="number"
+                        placeholder="80,0"
+                        min="20"
+                        max="500"
+                        step="0.1"
+                        inputmode="decimal"
+                        required
+                    >
+                    <span>kg</span>
+                </div>
+            </label>
+
+            <p
+                class="form-error"
+                id="weightFormError"
+                role="alert"
+            ></p>
+
+            <button class="submit-button" type="submit">
+                Messung speichern
             </button>
 
         </form>
