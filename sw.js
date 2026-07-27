@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "bodysync-v0.7";
+const CACHE_NAME = "bodysync-v1.0";
 
 const APP_FILES = [
     "./",
@@ -15,7 +15,9 @@ self.addEventListener("install", (event) => {
     event.waitUntil(
         caches
             .open(CACHE_NAME)
-            .then((cache) => cache.addAll(APP_FILES))
+            .then((cache) =>
+                cache.addAll(APP_FILES)
+            )
     );
 
     self.skipWaiting();
@@ -23,19 +25,24 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) =>
-            Promise.all(
-                cacheNames
-                    .filter(
-                        (cacheName) =>
-                            cacheName !== CACHE_NAME
-                    )
-                    .map(
-                        (cacheName) =>
-                            caches.delete(cacheName)
-                    )
+        caches
+            .keys()
+            .then((cacheNames) =>
+                Promise.all(
+                    cacheNames
+                        .filter(
+                            (cacheName) =>
+                                cacheName !==
+                                CACHE_NAME
+                        )
+                        .map(
+                            (cacheName) =>
+                                caches.delete(
+                                    cacheName
+                                )
+                        )
+                )
             )
-        )
     );
 
     self.clients.claim();
@@ -49,14 +56,22 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                const copy = response.clone();
+                const responseCopy =
+                    response.clone();
 
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, copy);
-                });
+                caches
+                    .open(CACHE_NAME)
+                    .then((cache) => {
+                        cache.put(
+                            event.request,
+                            responseCopy
+                        );
+                    });
 
                 return response;
             })
-            .catch(() => caches.match(event.request))
+            .catch(() =>
+                caches.match(event.request)
+            )
     );
 });
