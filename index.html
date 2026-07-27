@@ -305,6 +305,13 @@
                     </div>
                 </section>
 
+                <section class="content-card">
+                    <div class="section-header"><div><p class="eyebrow">Schnellauswahl</p><h2>Deine Lebensmittel</h2></div></div>
+                    <p class="section-intro">Häufig verwendete und favorisierte Lebensmittel kannst du mit einem Tipp erneut hinzufügen.</p>
+                    <div class="library-grid" id="foodLibrary"></div>
+                    <div class="empty-state compact-empty" id="foodLibraryEmpty"><h3>Noch keine Schnellauswahl</h3><p>Deine gespeicherten Einträge erscheinen automatisch hier.</p></div>
+                </section>
+
             </div>
 
             <!-- KALENDER -->
@@ -473,6 +480,21 @@
                         <small>gesamter Verlauf</small>
                     </article>
 
+                </section>
+
+                <section class="content-card analytics-card">
+                    <div class="section-header analytics-header">
+                        <div><p class="eyebrow">Entwicklung</p><h2>Gewichtsverlauf</h2></div>
+                        <div class="range-switch" aria-label="Zeitraum wählen"><button class="range-button active" type="button" data-trend-days="30">30 T</button><button class="range-button" type="button" data-trend-days="90">90 T</button></div>
+                    </div>
+                    <div class="chart-shell" id="weightChart" aria-label="Gewichtsdiagramm"></div>
+                    <div class="trend-summary" id="weightTrendSummary"></div>
+                </section>
+
+                <section class="content-card analytics-card">
+                    <div class="section-header analytics-header"><div><p class="eyebrow">Ernährung</p><h2>7-Tage-Trend</h2></div></div>
+                    <div class="chart-shell" id="nutritionChart" aria-label="Kalorientrend"></div>
+                    <div class="macro-average-grid"><div><strong id="averageCalories">0</strong><span>Ø kcal</span></div><div><strong id="averageProtein">0</strong><span>Ø Protein</span></div><div><strong id="averageCarbs">0</strong><span>Ø KH</span></div><div><strong id="averageFat">0</strong><span>Ø Fett</span></div></div>
                 </section>
 
                 <section class="content-card">
