@@ -26,141 +26,280 @@
 
         <header class="app-header">
             <div>
-                <p class="eyebrow" id="currentDate">Heute</p>
+                <p class="eyebrow" id="headerDate">Heute</p>
                 <h1>BodySync</h1>
             </div>
 
-            <div class="profile-badge" aria-label="BodySync">
+            <button
+                class="profile-badge"
+                id="todayButton"
+                type="button"
+                aria-label="Zum heutigen Tag wechseln"
+            >
                 BS
-            </div>
+            </button>
         </header>
 
         <main class="main-content">
 
-            <section class="summary-card">
-                <p class="summary-label">Tagesübersicht</p>
-                <h2>Bleib heute im Rhythmus</h2>
+            <!-- DASHBOARD -->
 
-                <p class="summary-text">
-                    Erfasse deine Lebensmittel und behalte Kalorien
-                    und Protein im Blick.
-                </p>
-            </section>
+            <div class="app-view active" id="dashboardView">
 
-            <section class="stats-grid">
+                <section class="summary-card">
+                    <div class="summary-topline">
+                        <p class="summary-label">Tagesübersicht</p>
 
-                <article class="stat-card">
-                    <div class="stat-heading">
-                        <span>Kalorien</span>
-                        <span id="caloriesPercentage">0 %</span>
+                        <button
+                            class="summary-date-button"
+                            id="openCalendarButton"
+                            type="button"
+                        >
+                            Datum wählen
+                        </button>
                     </div>
 
-                    <div class="stat-value">
-                        <strong id="caloriesConsumed">0</strong>
-                        <span>/ 2000 kcal</span>
+                    <h2 id="summaryTitle">
+                        Bleib heute im Rhythmus
+                    </h2>
+
+                    <p class="summary-text" id="selectedDateText">
+                        Deine Werte für heute.
+                    </p>
+                </section>
+
+                <section class="stats-grid">
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Kalorien</span>
+                            <span id="caloriesPercentage">0 %</span>
+                        </div>
+
+                        <div class="stat-value">
+                            <strong id="caloriesConsumed">0</strong>
+                            <span>/ 2000 kcal</span>
+                        </div>
+
+                        <div
+                            class="progress-track"
+                            role="progressbar"
+                            aria-label="Kalorienfortschritt"
+                            aria-valuemin="0"
+                            aria-valuemax="2000"
+                            aria-valuenow="0"
+                            id="caloriesProgressTrack"
+                        >
+                            <div
+                                class="progress-fill"
+                                id="caloriesProgress"
+                            ></div>
+                        </div>
+
+                        <p
+                            class="remaining-text"
+                            id="caloriesRemaining"
+                        >
+                            Noch 2000 kcal verfügbar
+                        </p>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Protein</span>
+                            <span id="proteinPercentage">0 %</span>
+                        </div>
+
+                        <div class="stat-value">
+                            <strong id="proteinConsumed">0</strong>
+                            <span>/ 160 g</span>
+                        </div>
+
+                        <div
+                            class="progress-track"
+                            role="progressbar"
+                            aria-label="Proteinfortschritt"
+                            aria-valuemin="0"
+                            aria-valuemax="160"
+                            aria-valuenow="0"
+                            id="proteinProgressTrack"
+                        >
+                            <div
+                                class="progress-fill"
+                                id="proteinProgress"
+                            ></div>
+                        </div>
+
+                        <p
+                            class="remaining-text"
+                            id="proteinRemaining"
+                        >
+                            Noch 160 g verfügbar
+                        </p>
+                    </article>
+
+                </section>
+
+                <section class="food-section">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Ernährung</p>
+                            <h2 id="foodSectionTitle">
+                                Heute gegessen
+                            </h2>
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            id="openFoodDialog"
+                            type="button"
+                        >
+                            Hinzufügen
+                        </button>
+                    </div>
+
+                    <div class="food-list" id="foodList"></div>
+
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M7 3v7M10 3v7M7 7h3M8.5 10v11M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"
+                                />
+                            </svg>
+                        </div>
+
+                        <h3>Noch keine Einträge</h3>
+
+                        <p id="emptyStateText">
+                            Füge dein erstes Lebensmittel hinzu.
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            id="emptyAddButton"
+                            type="button"
+                        >
+                            Lebensmittel hinzufügen
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- KALENDER -->
+
+            <div class="app-view" id="calendarView">
+
+                <section class="calendar-card">
+
+                    <div class="calendar-header">
+                        <div>
+                            <p class="eyebrow">Verlauf</p>
+                            <h2 id="calendarMonthTitle">
+                                Juli 2026
+                            </h2>
+                        </div>
+
+                        <div class="calendar-controls">
+                            <button
+                                class="calendar-arrow"
+                                id="previousMonthButton"
+                                type="button"
+                                aria-label="Vorheriger Monat"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m15 18-6-6 6-6"/>
+                                </svg>
+                            </button>
+
+                            <button
+                                class="calendar-arrow"
+                                id="nextMonthButton"
+                                type="button"
+                                aria-label="Nächster Monat"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m9 18 6-6-6-6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="weekday-grid" aria-hidden="true">
+                        <span>Mo</span>
+                        <span>Di</span>
+                        <span>Mi</span>
+                        <span>Do</span>
+                        <span>Fr</span>
+                        <span>Sa</span>
+                        <span>So</span>
                     </div>
 
                     <div
-                        class="progress-track"
-                        role="progressbar"
-                        aria-label="Kalorienfortschritt"
-                        aria-valuemin="0"
-                        aria-valuemax="2000"
-                        aria-valuenow="0"
-                        id="caloriesProgressTrack"
-                    >
-                        <div
-                            class="progress-fill"
-                            id="caloriesProgress"
-                        ></div>
-                    </div>
+                        class="calendar-grid"
+                        id="calendarGrid"
+                    ></div>
 
-                    <p class="remaining-text" id="caloriesRemaining">
-                        Noch 2000 kcal verfügbar
-                    </p>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-heading">
-                        <span>Protein</span>
-                        <span id="proteinPercentage">0 %</span>
-                    </div>
-
-                    <div class="stat-value">
-                        <strong id="proteinConsumed">0</strong>
-                        <span>/ 160 g</span>
-                    </div>
-
-                    <div
-                        class="progress-track"
-                        role="progressbar"
-                        aria-label="Proteinfortschritt"
-                        aria-valuemin="0"
-                        aria-valuemax="160"
-                        aria-valuenow="0"
-                        id="proteinProgressTrack"
-                    >
-                        <div
-                            class="progress-fill"
-                            id="proteinProgress"
-                        ></div>
-                    </div>
-
-                    <p class="remaining-text" id="proteinRemaining">
-                        Noch 160 g verfügbar
-                    </p>
-                </article>
-
-            </section>
-
-            <section class="food-section">
-                <div class="section-header">
-                    <div>
-                        <p class="eyebrow">Ernährung</p>
-                        <h2>Heute gegessen</h2>
+                    <div class="calendar-legend">
+                        <span class="legend-dot"></span>
+                        <span>Tag mit Ernährungseinträgen</span>
                     </div>
 
                     <button
-                        class="primary-button"
-                        id="openFoodDialog"
+                        class="today-wide-button"
+                        id="calendarTodayButton"
                         type="button"
                     >
-                        Hinzufügen
+                        Zum heutigen Tag
                     </button>
-                </div>
+                </section>
 
-                <div class="food-list" id="foodList"></div>
+                <section class="calendar-summary-card">
+                    <p class="eyebrow">Ausgewählter Tag</p>
 
-                <div class="empty-state" id="emptyState">
-                    <div class="empty-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                            <path
-                                d="M7 3v7M10 3v7M7 7h3M8.5 10v11M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"
-                            />
-                        </svg>
+                    <h2 id="calendarSelectedDate">
+                        Heute
+                    </h2>
+
+                    <div class="calendar-summary-values">
+                        <div>
+                            <strong id="calendarCalories">0</strong>
+                            <span>kcal</span>
+                        </div>
+
+                        <div>
+                            <strong id="calendarProtein">0</strong>
+                            <span>g Protein</span>
+                        </div>
+
+                        <div>
+                            <strong id="calendarFoodCount">0</strong>
+                            <span>Einträge</span>
+                        </div>
                     </div>
 
-                    <h3>Noch keine Einträge</h3>
-
-                    <p>
-                        Füge dein erstes Lebensmittel hinzu.
-                    </p>
-
                     <button
-                        class="secondary-button"
-                        id="emptyAddButton"
+                        class="primary-wide-button"
+                        id="openSelectedDayButton"
                         type="button"
                     >
-                        Lebensmittel hinzufügen
+                        Tag öffnen
                     </button>
-                </div>
-            </section>
+                </section>
+
+            </div>
 
         </main>
 
         <nav class="tab-bar" aria-label="Hauptnavigation">
 
-            <button class="tab-button active" type="button">
+            <button
+                class="tab-button active"
+                id="dashboardTab"
+                type="button"
+                data-view="dashboard"
+            >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M3 11.5 12 4l9 7.5"/>
                     <path d="M5.5 10.5V20h13v-9.5"/>
@@ -176,7 +315,12 @@
                 <span>Essen</span>
             </button>
 
-            <button class="tab-button" type="button" disabled>
+            <button
+                class="tab-button"
+                id="calendarTab"
+                type="button"
+                data-view="calendar"
+            >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="16" rx="2"/>
                     <path d="M7 3v4M17 3v4M3 10h18"/>
@@ -211,7 +355,10 @@
 
             <div class="dialog-header">
                 <div>
-                    <p class="eyebrow">Neuer Eintrag</p>
+                    <p class="eyebrow" id="dialogDateLabel">
+                        Neuer Eintrag
+                    </p>
+
                     <h2>Lebensmittel hinzufügen</h2>
                 </div>
 
