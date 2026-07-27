@@ -1,297 +1,583 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
+:root {
+    color-scheme: light;
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+    --background: #f2f4f6;
+    --surface: #ffffff;
+    --surface-soft: #f7f8f9;
+    --text: #171a1d;
+    --text-soft: #6c7279;
+    --primary: #315c4b;
+    --primary-dark: #244638;
+    --primary-soft: #dfebe6;
+    --border: #e5e8eb;
+    --danger: #a63b3b;
+    --danger-soft: #faeaea;
 
-    <meta name="theme-color" content="#315c4b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="BodySync">
+    --shadow:
+        0 18px 45px rgba(25, 35, 31, 0.08);
 
-    <title>BodySync</title>
+    --small-shadow:
+        0 8px 24px rgba(25, 35, 31, 0.07);
+}
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="assets/icon.svg">
-    <link rel="stylesheet" href="style.css">
-</head>
+* {
+    box-sizing: border-box;
+}
 
-<body>
-    <div class="app-shell">
+html {
+    min-height: 100%;
+    background: var(--background);
+}
 
-        <header class="app-header">
-            <div>
-                <p class="eyebrow" id="currentDate">Heute</p>
-                <h1>BodySync</h1>
-            </div>
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    background: var(--background);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
 
-            <div class="profile-badge" aria-label="BodySync">
-                BS
-            </div>
-        </header>
+button,
+input {
+    font: inherit;
+}
 
-        <main class="main-content">
+button {
+    -webkit-tap-highlight-color: transparent;
+}
 
-            <section class="summary-card">
-                <p class="summary-label">Tagesübersicht</p>
-                <h2>Bleib heute im Rhythmus</h2>
+button:disabled {
+    cursor: default;
+}
 
-                <p class="summary-text">
-                    Erfasse deine Lebensmittel und behalte Kalorien
-                    und Protein im Blick.
-                </p>
-            </section>
+.app-shell {
+    width: 100%;
+    max-width: 540px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        calc(112px + env(safe-area-inset-bottom));
+}
 
-            <section class="stats-grid">
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
 
-                <article class="stat-card">
-                    <div class="stat-heading">
-                        <span>Kalorien</span>
-                        <span id="caloriesPercentage">0 %</span>
-                    </div>
+.app-header h1 {
+    margin: 4px 0 0;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -1.3px;
+}
 
-                    <div class="stat-value">
-                        <strong id="caloriesConsumed">0</strong>
-                        <span>/ 2000 kcal</span>
-                    </div>
+.eyebrow {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
 
-                    <div
-                        class="progress-track"
-                        role="progressbar"
-                        aria-label="Kalorienfortschritt"
-                        aria-valuemin="0"
-                        aria-valuemax="2000"
-                        aria-valuenow="0"
-                        id="caloriesProgressTrack"
-                    >
-                        <div
-                            class="progress-fill"
-                            id="caloriesProgress"
-                        ></div>
-                    </div>
+.profile-badge {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(49, 92, 75, 0.1);
+    border-radius: 17px;
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--small-shadow);
+    font-size: 14px;
+    font-weight: 800;
+}
 
-                    <p class="remaining-text" id="caloriesRemaining">
-                        Noch 2000 kcal verfügbar
-                    </p>
-                </article>
+.main-content {
+    display: grid;
+    gap: 20px;
+}
 
-                <article class="stat-card">
-                    <div class="stat-heading">
-                        <span>Protein</span>
-                        <span id="proteinPercentage">0 %</span>
-                    </div>
+.summary-card {
+    padding: 27px;
+    border-radius: 28px;
+    background:
+        linear-gradient(
+            145deg,
+            #315c4b,
+            #244638
+        );
+    color: #ffffff;
+    box-shadow: var(--shadow);
+}
 
-                    <div class="stat-value">
-                        <strong id="proteinConsumed">0</strong>
-                        <span>/ 160 g</span>
-                    </div>
+.summary-label {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
 
-                    <div
-                        class="progress-track"
-                        role="progressbar"
-                        aria-label="Proteinfortschritt"
-                        aria-valuemin="0"
-                        aria-valuemax="160"
-                        aria-valuenow="0"
-                        id="proteinProgressTrack"
-                    >
-                        <div
-                            class="progress-fill"
-                            id="proteinProgress"
-                        ></div>
-                    </div>
+.summary-card h2 {
+    max-width: 320px;
+    margin: 9px 0 11px;
+    font-size: 29px;
+    line-height: 1.08;
+    letter-spacing: -0.9px;
+}
 
-                    <p class="remaining-text" id="proteinRemaining">
-                        Noch 160 g verfügbar
-                    </p>
-                </article>
+.summary-text {
+    max-width: 400px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 15px;
+    line-height: 1.55;
+}
 
-            </section>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
 
-            <section class="food-section">
-                <div class="section-header">
-                    <div>
-                        <p class="eyebrow">Ernährung</p>
-                        <h2>Heute gegessen</h2>
-                    </div>
+.stat-card {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid rgba(20, 30, 26, 0.04);
+    border-radius: 23px;
+    background: var(--surface);
+    box-shadow: var(--small-shadow);
+}
 
-                    <button
-                        class="primary-button"
-                        id="openFoodDialog"
-                        type="button"
-                    >
-                        Hinzufügen
-                    </button>
-                </div>
+.stat-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--text-soft);
+    font-size: 13px;
+    font-weight: 700;
+}
 
-                <div class="food-list" id="foodList"></div>
+.stat-heading span:last-child {
+    color: var(--primary);
+}
 
-                <div class="empty-state" id="emptyState">
-                    <div class="empty-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                            <path
-                                d="M7 3v7M10 3v7M7 7h3M8.5 10v11M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"
-                            />
-                        </svg>
-                    </div>
+.stat-value {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 17px;
+}
 
-                    <h3>Noch keine Einträge</h3>
+.stat-value strong {
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.8px;
+}
 
-                    <p>
-                        Füge dein erstes Lebensmittel hinzu.
-                    </p>
+.stat-value span {
+    color: var(--text-soft);
+    font-size: 13px;
+}
 
-                    <button
-                        class="secondary-button"
-                        id="emptyAddButton"
-                        type="button"
-                    >
-                        Lebensmittel hinzufügen
-                    </button>
-                </div>
-            </section>
+.progress-track {
+    height: 8px;
+    margin-top: 18px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--primary-soft);
+}
 
-        </main>
+.progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+    transition: width 280ms ease;
+}
 
-        <nav class="tab-bar" aria-label="Hauptnavigation">
+.remaining-text {
+    margin: 11px 0 0;
+    color: var(--text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+}
 
-            <button class="tab-button active" type="button">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 11.5 12 4l9 7.5"/>
-                    <path d="M5.5 10.5V20h13v-9.5"/>
-                    <path d="M9.5 20v-6h5v6"/>
-                </svg>
-                <span>Start</span>
-            </button>
+.food-section {
+    padding: 22px;
+    border: 1px solid rgba(20, 30, 26, 0.04);
+    border-radius: 27px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-                <span>Essen</span>
-            </button>
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="3" y="5" width="18" height="16" rx="2"/>
-                    <path d="M7 3v4M17 3v4M3 10h18"/>
-                </svg>
-                <span>Kalender</span>
-            </button>
+.section-header h2 {
+    margin: 5px 0 0;
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.7px;
+}
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M5 19h14"/>
-                    <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
-                    <path d="M9 8h6"/>
-                </svg>
-                <span>Gewicht</span>
-            </button>
+.primary-button,
+.secondary-button,
+.submit-button {
+    border: 0;
+    cursor: pointer;
+    font-weight: 750;
+}
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path
-                        d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.6.8 1 1 .3.2.7.3 1.1.3h.1v4h-.1c-.4 0-.8.1-1.1.3-.4.2-.8.6-1 1Z"
-                    />
-                </svg>
-                <span>Optionen</span>
-            </button>
+.primary-button {
+    padding: 11px 15px;
+    border-radius: 14px;
+    background: var(--primary);
+    color: #ffffff;
+}
 
-        </nav>
-    </div>
+.primary-button:active,
+.submit-button:active {
+    background: var(--primary-dark);
+    transform: translateY(1px);
+}
 
-    <dialog class="food-dialog" id="foodDialog">
-        <form class="food-form" id="foodForm">
+.food-list {
+    display: grid;
+    gap: 11px;
+    margin-top: 20px;
+}
 
-            <div class="dialog-header">
-                <div>
-                    <p class="eyebrow">Neuer Eintrag</p>
-                    <h2>Lebensmittel hinzufügen</h2>
-                </div>
+.food-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface-soft);
+}
 
-                <button
-                    class="icon-button"
-                    id="closeFoodDialog"
-                    type="button"
-                    aria-label="Fenster schließen"
-                >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m6 6 12 12M18 6 6 18"/>
-                    </svg>
-                </button>
-            </div>
+.food-information {
+    min-width: 0;
+}
 
-            <label class="form-field">
-                <span>Lebensmittel</span>
+.food-information h3 {
+    overflow: hidden;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-                <input
-                    id="foodName"
-                    name="foodName"
-                    type="text"
-                    placeholder="Zum Beispiel Protein Kaffee"
-                    maxlength="80"
-                    autocomplete="off"
-                    required
-                >
-            </label>
+.food-nutrition {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 6px 0 0;
+    color: var(--text-soft);
+    font-size: 13px;
+}
 
-            <div class="form-grid">
+.delete-button {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 13px;
+    background: var(--danger-soft);
+    color: var(--danger);
+    cursor: pointer;
+}
 
-                <label class="form-field">
-                    <span>Kalorien</span>
+.delete-button svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 
-                    <div class="input-with-unit">
-                        <input
-                            id="foodCalories"
-                            name="foodCalories"
-                            type="number"
-                            placeholder="0"
-                            min="0"
-                            max="10000"
-                            step="1"
-                            inputmode="numeric"
-                            required
-                        >
-                        <span>kcal</span>
-                    </div>
-                </label>
+.delete-button:active {
+    transform: scale(0.96);
+}
 
-                <label class="form-field">
-                    <span>Protein</span>
+.empty-state {
+    margin-top: 20px;
+    padding: 29px 20px;
+    border: 1px dashed #d9dde0;
+    border-radius: 21px;
+    background: var(--surface-soft);
+    text-align: center;
+}
 
-                    <div class="input-with-unit">
-                        <input
-                            id="foodProtein"
-                            name="foodProtein"
-                            type="number"
-                            placeholder="0"
-                            min="0"
-                            max="1000"
-                            step="0.1"
-                            inputmode="decimal"
-                            required
-                        >
-                        <span>g</span>
-                    </div>
-                </label>
+.empty-state.hidden {
+    display: none;
+}
 
-            </div>
+.empty-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 14px;
+    border-radius: 16px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
 
-            <p class="form-error" id="formError" role="alert"></p>
+.empty-icon svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 
-            <button class="submit-button" type="submit">
-                Eintrag speichern
-            </button>
+.empty-state h3 {
+    margin: 0;
+    font-size: 17px;
+}
 
-        </form>
-    </dialog>
+.empty-state p {
+    margin: 7px 0 17px;
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
 
-    <script src="app.js"></script>
-</body>
-</html>
+.secondary-button {
+    padding: 11px 15px;
+    border-radius: 14px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+}
+
+.tab-bar {
+    position: fixed;
+    z-index: 20;
+    left: 50%;
+    bottom: 0;
+    width: min(540px, 100%);
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding:
+        10px 10px
+        calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(22, 30, 26, 0.07);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 -12px 35px rgba(25, 35, 31, 0.06);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.tab-button {
+    min-width: 0;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 5px 2px;
+    border: 0;
+    background: transparent;
+    color: #92979c;
+    font-size: 10px;
+}
+
+.tab-button svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.tab-button.active {
+    color: var(--primary);
+    font-weight: 750;
+}
+
+.tab-button:disabled {
+    opacity: 0.72;
+}
+
+.food-dialog {
+    width: min(500px, calc(100% - 28px));
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    overflow: auto;
+    border: 0;
+    border-radius: 27px;
+    background: transparent;
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+.food-dialog::backdrop {
+    background: rgba(13, 18, 16, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.food-form {
+    padding: 24px;
+    border-radius: 27px;
+    background: var(--surface);
+}
+
+.dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dialog-header h2 {
+    margin: 5px 0 0;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.7px;
+}
+
+.icon-button {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 14px;
+    background: var(--surface-soft);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.icon-button svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+}
+
+.form-field {
+    display: grid;
+    gap: 8px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-field input {
+    width: 100%;
+    min-width: 0;
+    height: 52px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    outline: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    font-size: 16px;
+}
+
+.form-field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(49, 92, 75, 0.12);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 17px;
+}
+
+.input-with-unit {
+    position: relative;
+}
+
+.input-with-unit input {
+    padding-right: 52px;
+}
+
+.input-with-unit > span {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: var(--text-soft);
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.form-error {
+    min-height: 19px;
+    margin: 13px 0 0;
+    color: var(--danger);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.submit-button {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 5px;
+    border-radius: 16px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 15px;
+}
+
+@media (max-width: 390px) {
+    .app-shell {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 700px) {
+    .app-shell {
+        padding-top: 38px;
+    }
+}
