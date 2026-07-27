@@ -12,6 +12,8 @@
     --border: #e5e8eb;
     --danger: #a63b3b;
     --danger-soft: #faeaea;
+    --weight: #5970a8;
+    --weight-soft: #e7ebf5;
 
     --shadow:
         0 18px 45px rgba(25, 35, 31, 0.08);
@@ -120,17 +122,30 @@ button:disabled {
     gap: 20px;
 }
 
-.summary-card {
+.summary-card,
+.weight-hero-card {
     padding: 27px;
     border-radius: 28px;
+    color: #ffffff;
+    box-shadow: var(--shadow);
+}
+
+.summary-card {
     background:
         linear-gradient(
             145deg,
             #315c4b,
             #244638
         );
-    color: #ffffff;
-    box-shadow: var(--shadow);
+}
+
+.weight-hero-card {
+    background:
+        linear-gradient(
+            145deg,
+            #5970a8,
+            #3f527e
+        );
 }
 
 .summary-topline {
@@ -182,7 +197,8 @@ button:disabled {
     gap: 14px;
 }
 
-.stat-card {
+.stat-card,
+.weight-stat-card {
     min-width: 0;
     padding: 20px;
     border: 1px solid rgba(20, 30, 26, 0.04);
@@ -249,7 +265,8 @@ button:disabled {
 
 .food-section,
 .calendar-card,
-.calendar-summary-card {
+.calendar-summary-card,
+.weight-history-card {
     padding: 22px;
     border: 1px solid rgba(20, 30, 26, 0.04);
     border-radius: 27px;
@@ -257,7 +274,8 @@ button:disabled {
     box-shadow: var(--shadow);
 }
 
-.section-header {
+.section-header,
+.calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -293,17 +311,18 @@ button:disabled {
 .primary-button:active,
 .submit-button:active,
 .primary-wide-button:active {
-    background: var(--primary-dark);
     transform: translateY(1px);
 }
 
-.food-list {
+.food-list,
+.weight-history-list {
     display: grid;
     gap: 11px;
     margin-top: 20px;
 }
 
-.food-item {
+.food-item,
+.weight-history-item {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -314,11 +333,13 @@ button:disabled {
     background: var(--surface-soft);
 }
 
-.food-information {
+.food-information,
+.weight-history-information {
     min-width: 0;
 }
 
-.food-information h3 {
+.food-information h3,
+.weight-history-information h3 {
     overflow: hidden;
     margin: 0;
     font-size: 16px;
@@ -327,7 +348,8 @@ button:disabled {
     white-space: nowrap;
 }
 
-.food-nutrition {
+.food-nutrition,
+.weight-history-date {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 12px;
@@ -336,6 +358,12 @@ button:disabled {
     font-size: 13px;
 }
 
+.item-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.edit-button,
 .delete-button {
     width: 40px;
     height: 40px;
@@ -343,11 +371,20 @@ button:disabled {
     place-items: center;
     border: 0;
     border-radius: 13px;
-    background: var(--danger-soft);
-    color: var(--danger);
     cursor: pointer;
 }
 
+.edit-button {
+    background: var(--weight-soft);
+    color: var(--weight);
+}
+
+.delete-button {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.edit-button svg,
 .delete-button svg {
     width: 19px;
     height: 19px;
@@ -358,6 +395,7 @@ button:disabled {
     stroke-linejoin: round;
 }
 
+.edit-button:active,
 .delete-button:active {
     transform: scale(0.96);
 }
@@ -415,13 +453,6 @@ button:disabled {
     color: var(--primary-dark);
 }
 
-.calendar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
 .calendar-controls {
     display: flex;
     gap: 8px;
@@ -473,6 +504,7 @@ button:disabled {
     aspect-ratio: 1;
     display: grid;
     place-items: center;
+    padding-bottom: 7px;
     border: 0;
     border-radius: 13px;
     background: transparent;
@@ -499,35 +531,58 @@ button:disabled {
     color: #ffffff;
 }
 
-.calendar-day.has-entries::after {
-    content: "";
+.day-markers {
     position: absolute;
-    bottom: 6px;
+    bottom: 5px;
+    display: flex;
+    gap: 3px;
+}
+
+.day-marker {
     width: 4px;
     height: 4px;
     border-radius: 50%;
+}
+
+.day-marker.food {
     background: var(--primary);
 }
 
-.calendar-day.selected.has-entries::after {
+.day-marker.weight {
+    background: var(--weight);
+}
+
+.calendar-day.selected .day-marker {
     background: #ffffff;
+}
+
+.calendar-legends {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 17px;
 }
 
 .calendar-legend {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 7px;
-    margin-top: 17px;
     color: var(--text-soft);
     font-size: 12px;
 }
 
 .legend-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
+}
+
+.food-dot {
     background: var(--primary);
+}
+
+.weight-dot {
+    background: var(--weight);
 }
 
 .today-wide-button {
@@ -582,6 +637,57 @@ button:disabled {
     color: #ffffff;
 }
 
+.weight-main-value {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin: 22px 0 8px;
+}
+
+.weight-main-value strong {
+    font-size: 58px;
+    line-height: 0.95;
+    letter-spacing: -2.5px;
+}
+
+.weight-main-value span {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.weight-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.weight-stat-card {
+    padding: 16px 12px;
+}
+
+.weight-stat-card > span {
+    display: block;
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.weight-stat-card strong {
+    display: block;
+    margin-top: 9px;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+}
+
+.weight-stat-card small {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-soft);
+    font-size: 9px;
+    line-height: 1.3;
+}
+
 .tab-bar {
     position: fixed;
     z-index: 20;
@@ -633,7 +739,7 @@ button:disabled {
     opacity: 0.72;
 }
 
-.food-dialog {
+.app-dialog {
     width: min(500px, calc(100% - 28px));
     max-height: calc(100vh - 40px);
     padding: 0;
@@ -645,13 +751,13 @@ button:disabled {
     box-shadow: var(--shadow);
 }
 
-.food-dialog::backdrop {
+.app-dialog::backdrop {
     background: rgba(13, 18, 16, 0.5);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
 
-.food-form {
+.dialog-form {
     padding: 24px;
     border-radius: 27px;
     background: var(--surface);
@@ -727,6 +833,10 @@ button:disabled {
     margin-top: 17px;
 }
 
+.weight-input-field {
+    margin-top: 17px;
+}
+
 .input-with-unit {
     position: relative;
 }
@@ -781,6 +891,14 @@ button:disabled {
     .calendar-day {
         border-radius: 10px;
         font-size: 12px;
+    }
+
+    .weight-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .weight-stat-card {
+        padding: 16px;
     }
 }
 
