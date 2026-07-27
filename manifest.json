@@ -1,0 +1,20 @@
+{
+    "name": "BodySync",
+    "short_name": "BodySync",
+    "description": "Persönlicher Kalorien-, Protein- und Gewichtstracker",
+    "lang": "de-DE",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f2f4f6",
+    "theme_color": "#315c4b",
+    "icons": [
+        {
+            "src": "assets/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}
