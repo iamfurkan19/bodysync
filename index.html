@@ -32,9 +32,9 @@
 
             <button
                 class="profile-badge"
-                id="todayButton"
+                id="profileButton"
                 type="button"
-                aria-label="Zum heutigen Tag wechseln"
+                aria-label="Optionen öffnen"
             >
                 BS
             </button>
@@ -42,7 +42,7 @@
 
         <main class="main-content">
 
-            <!-- DASHBOARD -->
+            <!-- START -->
 
             <div class="app-view active" id="dashboardView">
 
@@ -78,7 +78,7 @@
 
                         <div class="stat-value">
                             <strong id="caloriesConsumed">0</strong>
-                            <span>/ 2000 kcal</span>
+                            <span id="caloriesGoalLabel">/ 2000 kcal</span>
                         </div>
 
                         <div
@@ -112,7 +112,7 @@
 
                         <div class="stat-value">
                             <strong id="proteinConsumed">0</strong>
-                            <span>/ 160 g</span>
+                            <span id="proteinGoalLabel">/ 160 g</span>
                         </div>
 
                         <div
@@ -140,7 +140,7 @@
 
                 </section>
 
-                <section class="food-section">
+                <section class="content-card">
                     <div class="section-header">
                         <div>
                             <p class="eyebrow">Ernährung</p>
@@ -158,26 +158,25 @@
                         </button>
                     </div>
 
-                    <div class="food-list" id="foodList"></div>
+                    <div class="item-list" id="foodList"></div>
 
-                    <div class="empty-state" id="emptyState">
+                    <div class="empty-state" id="foodEmptyState">
                         <div class="empty-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24">
-                                <path
-                                    d="M7 3v7M10 3v7M7 7h3M8.5 10v11M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"
-                                />
+                                <path d="M7 3v7M10 3v7M7 7h3M8.5 10v11"/>
+                                <path d="M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"/>
                             </svg>
                         </div>
 
                         <h3>Noch keine Einträge</h3>
 
-                        <p id="emptyStateText">
+                        <p id="foodEmptyText">
                             Füge dein erstes Lebensmittel hinzu.
                         </p>
 
                         <button
                             class="secondary-button"
-                            id="emptyAddButton"
+                            id="foodEmptyAddButton"
                             type="button"
                         >
                             Lebensmittel hinzufügen
@@ -191,14 +190,12 @@
 
             <div class="app-view" id="calendarView">
 
-                <section class="calendar-card">
+                <section class="content-card">
 
                     <div class="calendar-header">
                         <div>
                             <p class="eyebrow">Verlauf</p>
-                            <h2 id="calendarMonthTitle">
-                                Monat
-                            </h2>
+                            <h2 id="calendarMonthTitle">Monat</h2>
                         </div>
 
                         <div class="calendar-controls">
@@ -254,7 +251,7 @@
                     </div>
 
                     <button
-                        class="today-wide-button"
+                        class="secondary-wide-button"
                         id="calendarTodayButton"
                         type="button"
                     >
@@ -262,10 +259,9 @@
                     </button>
                 </section>
 
-                <section class="calendar-summary-card">
+                <section class="content-card">
                     <p class="eyebrow">Ausgewählter Tag</p>
-
-                    <h2 id="calendarSelectedDate">
+                    <h2 class="card-title" id="calendarSelectedDate">
                         Heute
                     </h2>
 
@@ -333,6 +329,14 @@
                     </article>
 
                     <article class="weight-stat-card">
+                        <span>Zielgewicht</span>
+                        <strong id="targetWeightDisplay">–</strong>
+                        <small id="targetWeightDifference">
+                            In Optionen festlegen
+                        </small>
+                    </article>
+
+                    <article class="weight-stat-card">
                         <span>Niedrigster Wert</span>
                         <strong id="lowestWeight">–</strong>
                         <small>gesamter Verlauf</small>
@@ -343,9 +347,10 @@
                         <strong id="highestWeight">–</strong>
                         <small>gesamter Verlauf</small>
                     </article>
+
                 </section>
 
-                <section class="weight-history-card">
+                <section class="content-card">
                     <div class="section-header">
                         <div>
                             <p class="eyebrow">Messungen</p>
@@ -362,7 +367,7 @@
                     </div>
 
                     <div
-                        class="weight-history-list"
+                        class="item-list"
                         id="weightHistoryList"
                     ></div>
 
@@ -370,7 +375,7 @@
                         class="empty-state"
                         id="weightEmptyState"
                     >
-                        <div class="empty-icon" aria-hidden="true">
+                        <div class="empty-icon weight-empty-icon">
                             <svg viewBox="0 0 24 24">
                                 <path d="M5 19h14"/>
                                 <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
@@ -397,6 +402,132 @@
 
             </div>
 
+            <!-- OPTIONEN -->
+
+            <div class="app-view" id="settingsView">
+
+                <section class="settings-hero-card">
+                    <p class="summary-label">Persönliche Einstellungen</p>
+
+                    <h2 id="settingsGreeting">
+                        Deine Ziele
+                    </h2>
+
+                    <p class="summary-text">
+                        Passe BodySync an deine persönlichen
+                        Ernährungs- und Gewichtsziele an.
+                    </p>
+                </section>
+
+                <section class="content-card">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Profil und Ziele</p>
+                            <h2>Einstellungen</h2>
+                        </div>
+                    </div>
+
+                    <form class="settings-form" id="settingsForm">
+
+                        <label class="form-field">
+                            <span>Anzeigename</span>
+
+                            <input
+                                id="displayName"
+                                type="text"
+                                maxlength="40"
+                                placeholder="Dein Name"
+                                autocomplete="name"
+                            >
+                        </label>
+
+                        <label class="form-field">
+                            <span>Tägliches Kalorienziel</span>
+
+                            <div class="input-with-unit">
+                                <input
+                                    id="calorieGoal"
+                                    type="number"
+                                    min="500"
+                                    max="10000"
+                                    step="10"
+                                    inputmode="numeric"
+                                    required
+                                >
+                                <span>kcal</span>
+                            </div>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Tägliches Proteinziel</span>
+
+                            <div class="input-with-unit">
+                                <input
+                                    id="proteinGoal"
+                                    type="number"
+                                    min="10"
+                                    max="1000"
+                                    step="1"
+                                    inputmode="numeric"
+                                    required
+                                >
+                                <span>g</span>
+                            </div>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Zielgewicht</span>
+
+                            <div class="input-with-unit">
+                                <input
+                                    id="targetWeight"
+                                    type="number"
+                                    min="20"
+                                    max="500"
+                                    step="0.1"
+                                    inputmode="decimal"
+                                    required
+                                >
+                                <span>kg</span>
+                            </div>
+                        </label>
+
+                        <p
+                            class="form-error"
+                            id="settingsFormError"
+                            role="alert"
+                        ></p>
+
+                        <p
+                            class="form-success"
+                            id="settingsFormSuccess"
+                            role="status"
+                        ></p>
+
+                        <button
+                            class="submit-button"
+                            type="submit"
+                        >
+                            Einstellungen speichern
+                        </button>
+
+                    </form>
+                </section>
+
+                <section class="content-card information-card">
+                    <p class="eyebrow">Speicherung</p>
+                    <h2 class="card-title">Deine Daten</h2>
+
+                    <p>
+                        BodySync speichert deine Daten aktuell lokal
+                        auf diesem Gerät. Bei einem Wechsel des
+                        Browsers oder Geräts werden sie noch nicht
+                        automatisch übertragen.
+                    </p>
+                </section>
+
+            </div>
+
         </main>
 
         <nav class="tab-bar" aria-label="Hauptnavigation">
@@ -406,7 +537,7 @@
                 id="dashboardTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
                     <path d="M3 11.5 12 4l9 7.5"/>
                     <path d="M5.5 10.5V20h13v-9.5"/>
                     <path d="M9.5 20v-6h5v6"/>
@@ -415,7 +546,7 @@
             </button>
 
             <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
                 <span>Essen</span>
@@ -426,7 +557,7 @@
                 id="calendarTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
                     <rect x="3" y="5" width="18" height="16" rx="2"/>
                     <path d="M7 3v4M17 3v4M3 10h18"/>
                 </svg>
@@ -438,7 +569,7 @@
                 id="weightTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
                     <path d="M5 19h14"/>
                     <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
                     <path d="M9 8h6"/>
@@ -446,8 +577,12 @@
                 <span>Gewicht</span>
             </button>
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+            <button
+                class="tab-button"
+                id="settingsTab"
+                type="button"
+            >
+                <svg viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3"/>
                     <path
                         d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.6.8 1 1 .3.2.7.3 1.1.3h.1v4h-.1c-.4 0-.8.1-1.1.3-.4.2-.8.6-1 1Z"
@@ -459,14 +594,14 @@
         </nav>
     </div>
 
-    <!-- LEBENSMITTEL-DIALOG -->
+    <!-- LEBENSMITTEL -->
 
     <dialog class="app-dialog" id="foodDialog">
         <form class="dialog-form" id="foodForm">
 
             <div class="dialog-header">
                 <div>
-                    <p class="eyebrow" id="dialogDateLabel">
+                    <p class="eyebrow" id="foodDialogDate">
                         Neuer Eintrag
                     </p>
 
@@ -479,7 +614,7 @@
                     type="button"
                     aria-label="Fenster schließen"
                 >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
                         <path d="m6 6 12 12M18 6 6 18"/>
                     </svg>
                 </button>
@@ -491,8 +626,8 @@
                 <input
                     id="foodName"
                     type="text"
-                    placeholder="Zum Beispiel Protein Kaffee"
                     maxlength="80"
+                    placeholder="Zum Beispiel Protein Kaffee"
                     autocomplete="off"
                     required
                 >
@@ -507,7 +642,6 @@
                         <input
                             id="foodCalories"
                             type="number"
-                            placeholder="0"
                             min="0"
                             max="10000"
                             step="1"
@@ -525,7 +659,6 @@
                         <input
                             id="foodProtein"
                             type="number"
-                            placeholder="0"
                             min="0"
                             max="1000"
                             step="0.1"
@@ -538,7 +671,7 @@
 
             </div>
 
-            <p class="form-error" id="formError" role="alert"></p>
+            <p class="form-error" id="foodFormError"></p>
 
             <button class="submit-button" type="submit">
                 Eintrag speichern
@@ -547,7 +680,7 @@
         </form>
     </dialog>
 
-    <!-- GEWICHTS-DIALOG -->
+    <!-- GEWICHT -->
 
     <dialog class="app-dialog" id="weightDialog">
         <form class="dialog-form" id="weightForm">
@@ -569,7 +702,7 @@
                     type="button"
                     aria-label="Fenster schließen"
                 >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
                         <path d="m6 6 12 12M18 6 6 18"/>
                     </svg>
                 </button>
@@ -585,14 +718,13 @@
                 >
             </label>
 
-            <label class="form-field weight-input-field">
+            <label class="form-field">
                 <span>Gewicht</span>
 
                 <div class="input-with-unit">
                     <input
                         id="weightValue"
                         type="number"
-                        placeholder="80,0"
                         min="20"
                         max="500"
                         step="0.1"
@@ -603,11 +735,7 @@
                 </div>
             </label>
 
-            <p
-                class="form-error"
-                id="weightFormError"
-                role="alert"
-            ></p>
+            <p class="form-error" id="weightFormError"></p>
 
             <button class="submit-button" type="submit">
                 Messung speichern
