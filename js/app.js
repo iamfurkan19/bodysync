@@ -2,8 +2,8 @@ import { MEALS, getMealLabel, matchesFoodSearch } from "./food-model.js";
 
 "use strict";
 
-const STORAGE_KEY = "bodysync-data-v6";
-const OLD_STORAGE_KEY = "bodysync-data-v5";
+const STORAGE_KEY = "bodysync-data-v7";
+const OLD_STORAGE_KEYS = ["bodysync-data-v6", "bodysync-data-v5"];
 
 const defaultSettings = {
     displayName: "",
@@ -26,6 +26,7 @@ let pendingConfirmationAction = null;
 let toastTimer = null;
 let foodSearchQuery = "";
 let favoritesOnly = false;
+let trendDays = 30;
 
 const elements = {
     headerDate: document.getElementById("headerDate"),
@@ -131,6 +132,8 @@ const elements = {
         document.getElementById("foodViewAddButton"),
     foodEmptyAddButton:
         document.getElementById("foodEmptyAddButton"),
+    foodLibrary: document.getElementById("foodLibrary"),
+    foodLibraryEmpty: document.getElementById("foodLibraryEmpty"),
 
     calendarMonthTitle:
         document.getElementById("calendarMonthTitle"),
@@ -177,6 +180,13 @@ const elements = {
         document.getElementById("weightAddButton"),
     weightEmptyAddButton:
         document.getElementById("weightEmptyAddButton"),
+    weightChart: document.getElementById("weightChart"),
+    nutritionChart: document.getElementById("nutritionChart"),
+    weightTrendSummary: document.getElementById("weightTrendSummary"),
+    averageCalories: document.getElementById("averageCalories"),
+    averageProtein: document.getElementById("averageProtein"),
+    averageCarbs: document.getElementById("averageCarbs"),
+    averageFat: document.getElementById("averageFat"),
 
     settingsGreeting:
         document.getElementById("settingsGreeting"),
@@ -569,16 +579,13 @@ function loadData() {
             return;
         }
 
-        const oldStoredValue =
-            localStorage.getItem(OLD_STORAGE_KEY);
-
-        if (oldStoredValue) {
-            appData = sanitizeAppData(
-                JSON.parse(oldStoredValue)
-            );
-
+        for (const oldKey of OLD_STORAGE_KEYS) {
+            const oldStoredValue = localStorage.getItem(oldKey);
+            if (!oldStoredValue) continue;
+            appData = sanitizeAppData(JSON.parse(oldStoredValue));
             saveData();
-            localStorage.removeItem(OLD_STORAGE_KEY);
+            OLD_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+            return;
         }
     } catch (error) {
         console.error(
@@ -1306,13 +1313,47 @@ function populateSettingsForm() {
         appData.settings.targetWeight;
 }
 
+
+function getFoodLibrary() {
+    const map = new Map();
+    Object.values(appData.foodsByDate).flat().forEach((food) => {
+        const key = `${food.name.toLocaleLowerCase("de-DE")}|${food.calories}|${food.protein}|${food.carbs}|${food.fat}`;
+        const existing = map.get(key);
+        if (existing) { existing.uses += 1; existing.favorite ||= food.favorite; }
+        else map.set(key, { ...food, uses: 1 });
+    });
+    return [...map.values()].sort((a,b) => Number(b.favorite)-Number(a.favorite) || b.uses-a.uses || a.name.localeCompare(b.name,"de-DE")).slice(0,12);
+}
+function renderFoodLibrary() {
+    const foods=getFoodLibrary(); elements.foodLibrary.innerHTML="";
+    elements.foodLibraryEmpty.classList.toggle("hidden", foods.length>0);
+    foods.forEach((food,index)=>{ const button=document.createElement("button"); button.type="button"; button.className="library-item"; button.dataset.libraryIndex=index; button.innerHTML=`<span class="library-star">${food.favorite?"★":"＋"}</span><strong></strong><small>${food.calories} kcal · ${formatProtein(food.protein)} g Protein</small>`; button.querySelector("strong").textContent=food.name; elements.foodLibrary.append(button); });
+}
+function addLibraryFood(index) {
+    const source=getFoodLibrary()[index]; if(!source)return;
+    const foods=[...getFoodsForDate(selectedDateKey)]; foods.unshift({id:createId(),name:source.name,calories:source.calories,protein:source.protein,carbs:source.carbs||0,fat:source.fat||0,meal:source.meal||"snack",favorite:Boolean(source.favorite)});
+    setFoodsForDate(selectedDateKey,foods); saveData(); renderApp(); showToast(`${source.name} wurde hinzugefügt.`);
+}
+function getDateKeysEndingToday(days){const keys=[];const today=parseDateKey(getTodayKey());for(let offset=days-1;offset>=0;offset--){const d=new Date(today);d.setDate(today.getDate()-offset);keys.push(createDateKey(d));}return keys;}
+function createLineChart(points){if(!points.length)return '<div class="chart-empty">Noch nicht genügend Daten</div>';const w=320,h=150,p=18,vals=points.map(x=>x.value),min=Math.min(...vals),max=Math.max(...vals),spread=Math.max(max-min,1);const c=points.map((x,i)=>({...x,x:points.length===1?w/2:p+i*((w-p*2)/(points.length-1)),y:h-p-((x.value-min)/spread)*(h-p*2)}));return `<svg viewBox="0 0 ${w} ${h}" role="img"><line x1="${p}" y1="${p}" x2="${p}" y2="${h-p}"/><line x1="${p}" y1="${h-p}" x2="${w-p}" y2="${h-p}"/><polyline points="${c.map(x=>`${x.x},${x.y}`).join(" ")}"/>${c.map(x=>`<circle cx="${x.x}" cy="${x.y}" r="3"><title>${x.label}: ${formatWeight(x.value)} kg</title></circle>`).join("")}</svg>`;}
+function createBarChart(points,goal){const w=320,h=150,p=18,max=Math.max(goal,...points.map(x=>x.value),1),gap=(w-p*2)/points.length,bw=gap*.58,bars=points.map((x,i)=>{const bh=x.value/max*(h-p*2),xx=p+i*gap+(gap-bw)/2,yy=h-p-bh;return `<rect x="${xx}" y="${yy}" width="${bw}" height="${bh}" rx="4"><title>${x.label}: ${Math.round(x.value)} kcal</title></rect>`}).join(""),gy=h-p-goal/max*(h-p*2);return `<svg viewBox="0 0 ${w} ${h}" role="img"><line class="goal-line" x1="${p}" y1="${gy}" x2="${w-p}" y2="${gy}"/>${bars}</svg>`;}
+function renderAnalytics(){
+    const cutoff=new Date();cutoff.setHours(0,0,0,0);cutoff.setDate(cutoff.getDate()-trendDays+1);
+    const weights=getSortedWeights().filter(x=>parseDateKey(x.dateKey)>=cutoff).reverse(); elements.weightChart.innerHTML=createLineChart(weights.map(x=>({value:x.weight,label:formatDateShort(x.dateKey)})));
+    elements.weightTrendSummary.textContent=weights.length>=2?`${weights.at(-1).weight-weights[0].weight>0?"+":""}${formatWeight(weights.at(-1).weight-weights[0].weight)} kg im gewählten Zeitraum`:"Trage mindestens zwei Messungen für einen Trend ein.";
+    const totals=getDateKeysEndingToday(7).map(dateKey=>({dateKey,...calculateTotals(getFoodsForDate(dateKey))})); elements.nutritionChart.innerHTML=createBarChart(totals.map(x=>({value:x.calories,label:formatDateShort(x.dateKey)})),appData.settings.calorieGoal); const n=totals.length;
+    elements.averageCalories.textContent=Math.round(totals.reduce((s,x)=>s+x.calories,0)/n); elements.averageProtein.textContent=`${formatProtein(totals.reduce((s,x)=>s+x.protein,0)/n)} g`; elements.averageCarbs.textContent=`${formatProtein(totals.reduce((s,x)=>s+x.carbs,0)/n)} g`; elements.averageFat.textContent=`${formatProtein(totals.reduce((s,x)=>s+x.fat,0)/n)} g`;
+}
+
 function renderApp() {
     updateProfile();
     updateDateLabels();
     updateDashboard();
     renderFoods();
+    renderFoodLibrary();
     renderCalendar();
     updateWeightDashboard();
+    renderAnalytics();
     populateSettingsForm();
 }
 
@@ -1805,7 +1846,7 @@ function saveSettings(event) {
 function exportData() {
     const exportContent = {
         app: "BodySync",
-        version: "1.1",
+        version: "1.2",
         exportedAt:
             new Date().toISOString(),
         data: appData
@@ -1917,7 +1958,7 @@ function requestDataReset() {
             );
 
             localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem(OLD_STORAGE_KEY);
+            OLD_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
 
             saveData();
             renderApp();
@@ -2177,6 +2218,9 @@ elements.foodList.addEventListener(
     "click",
     handleFoodListClick
 );
+
+elements.foodLibrary.addEventListener("click", (event) => { const button=event.target.closest("[data-library-index]"); if(button)addLibraryFood(Number(button.dataset.libraryIndex)); });
+document.querySelectorAll("[data-trend-days]").forEach((button)=>button.addEventListener("click",()=>{trendDays=Number(button.dataset.trendDays);document.querySelectorAll("[data-trend-days]").forEach((item)=>item.classList.toggle("active",item===button));renderAnalytics();}));
 
 elements.foodDialog.addEventListener(
     "click",
