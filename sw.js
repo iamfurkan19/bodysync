@@ -1,12 +1,13 @@
 "use strict";
 
-const CACHE_NAME = "bodysync-v1.0";
+const CACHE_NAME = "bodysync-v1.1";
 
 const APP_FILES = [
     "./",
     "./index.html",
     "./style.css",
-    "./app.js",
+    "./js/app.js",
+    "./js/food-model.js",
     "./manifest.json",
     "./assets/icon.svg"
 ];

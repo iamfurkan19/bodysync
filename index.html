@@ -237,6 +237,16 @@
                         </div>
 
                         <div>
+                            <strong id="foodViewCarbs">0</strong>
+                            <span>g Kohlenhydrate</span>
+                        </div>
+
+                        <div>
+                            <strong id="foodViewFat">0</strong>
+                            <span>g Fett</span>
+                        </div>
+
+                        <div>
                             <strong id="foodViewCount">0</strong>
                             <span>Einträge</span>
                         </div>
@@ -259,6 +269,14 @@
                         >
                             Hinzufügen
                         </button>
+                    </div>
+
+                    <div class="food-tools">
+                        <label class="search-field">
+                            <span class="sr-only">Lebensmittel suchen</span>
+                            <input id="foodSearch" type="search" placeholder="Lebensmittel suchen" autocomplete="off">
+                        </label>
+                        <button class="filter-button" id="favoritesFilterButton" type="button" aria-pressed="false">★ Favoriten</button>
                     </div>
 
                     <div class="item-list" id="foodList"></div>
@@ -806,6 +824,16 @@
                 >
             </label>
 
+            <label class="form-field">
+                <span>Mahlzeit</span>
+                <select id="foodMeal" required>
+                    <option value="breakfast">Frühstück</option>
+                    <option value="lunch">Mittagessen</option>
+                    <option value="dinner">Abendessen</option>
+                    <option value="snack">Snacks</option>
+                </select>
+            </label>
+
             <div class="form-grid">
 
                 <label class="form-field">
@@ -842,7 +870,28 @@
                     </div>
                 </label>
 
+                <label class="form-field">
+                    <span>Kohlenhydrate</span>
+                    <div class="input-with-unit">
+                        <input id="foodCarbs" type="number" min="0" max="2000" step="0.1" inputmode="decimal" value="0" required>
+                        <span>g</span>
+                    </div>
+                </label>
+
+                <label class="form-field">
+                    <span>Fett</span>
+                    <div class="input-with-unit">
+                        <input id="foodFat" type="number" min="0" max="1000" step="0.1" inputmode="decimal" value="0" required>
+                        <span>g</span>
+                    </div>
+                </label>
+
             </div>
+
+            <label class="favorite-toggle">
+                <input id="foodFavorite" type="checkbox">
+                <span>Als Favorit speichern</span>
+            </label>
 
             <p
                 class="form-error"
@@ -972,6 +1021,6 @@
         aria-live="polite"
     ></div>
 
-    <script src="app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
