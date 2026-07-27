@@ -1,5 +1,7 @@
 "use strict";
 
+const STORAGE_KEY = "bodysync-foods-v1";
+
 const dailyGoals = {
     calories: 2000,
     protein: 160
@@ -70,6 +72,80 @@ function formatCurrentDate() {
     elements.currentDate.textContent =
         formattedDate.charAt(0).toUpperCase() +
         formattedDate.slice(1);
+}
+
+function createFoodId() {
+    if (
+        window.crypto &&
+        typeof window.crypto.randomUUID === "function"
+    ) {
+        return window.crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random()
+        .toString(16)
+        .slice(2)}`;
+}
+
+function isValidStoredFood(food) {
+    return (
+        food &&
+        typeof food.id === "string" &&
+        typeof food.name === "string" &&
+        Number.isFinite(food.calories) &&
+        Number.isFinite(food.protein) &&
+        food.calories >= 0 &&
+        food.protein >= 0
+    );
+}
+
+function loadFoods() {
+    try {
+        const storedValue = localStorage.getItem(STORAGE_KEY);
+
+        if (!storedValue) {
+            foods = [];
+            return;
+        }
+
+        const parsedFoods = JSON.parse(storedValue);
+
+        if (!Array.isArray(parsedFoods)) {
+            foods = [];
+            return;
+        }
+
+        foods = parsedFoods
+            .filter(isValidStoredFood)
+            .map((food) => ({
+                id: food.id,
+                name: food.name.trim(),
+                calories: Math.round(food.calories),
+                protein:
+                    Math.round(food.protein * 10) / 10
+            }));
+    } catch (error) {
+        console.error(
+            "Gespeicherte Lebensmittel konnten nicht geladen werden:",
+            error
+        );
+
+        foods = [];
+    }
+}
+
+function saveFoods() {
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(foods)
+        );
+    } catch (error) {
+        console.error(
+            "Lebensmittel konnten nicht gespeichert werden:",
+            error
+        );
+    }
 }
 
 function calculateTotals() {
@@ -239,7 +315,10 @@ function renderApp() {
 function openDialog() {
     elements.formError.textContent = "";
 
-    if (typeof elements.foodDialog.showModal === "function") {
+    if (
+        typeof elements.foodDialog.showModal ===
+        "function"
+    ) {
         elements.foodDialog.showModal();
     } else {
         elements.foodDialog.setAttribute("open", "");
@@ -251,7 +330,10 @@ function openDialog() {
 }
 
 function closeDialog() {
-    elements.foodDialog.close();
+    if (elements.foodDialog.open) {
+        elements.foodDialog.close();
+    }
+
     elements.foodForm.reset();
     elements.formError.textContent = "";
 }
@@ -280,8 +362,12 @@ function addFood(event) {
     event.preventDefault();
 
     const name = elements.foodName.value.trim();
-    const calories = Number(elements.foodCalories.value);
-    const protein = Number(elements.foodProtein.value);
+    const calories = Number(
+        elements.foodCalories.value
+    );
+    const protein = Number(
+        elements.foodProtein.value
+    );
 
     const validationError = validateFood(
         name,
@@ -290,27 +376,32 @@ function addFood(event) {
     );
 
     if (validationError) {
-        elements.formError.textContent = validationError;
+        elements.formError.textContent =
+            validationError;
         return;
     }
 
     const food = {
-        id: crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random()}`,
+        id: createFoodId(),
         name,
         calories: Math.round(calories),
-        protein: Math.round(protein * 10) / 10
+        protein:
+            Math.round(protein * 10) / 10
     };
 
     foods.unshift(food);
 
+    saveFoods();
     closeDialog();
     renderApp();
 }
 
 function deleteFood(foodId) {
-    foods = foods.filter((food) => food.id !== foodId);
+    foods = foods.filter(
+        (food) => food.id !== foodId
+    );
+
+    saveFoods();
     renderApp();
 }
 
@@ -378,5 +469,6 @@ elements.foodDialog.addEventListener(
 );
 
 formatCurrentDate();
+loadFoods();
 renderApp();
 registerServiceWorker();
