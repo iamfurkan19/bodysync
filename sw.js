@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "bodysync-v0.3";
+const CACHE_NAME = "bodysync-v0.4";
 
 const APP_FILES = [
     "./",
