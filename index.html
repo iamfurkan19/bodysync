@@ -42,7 +42,7 @@
 
         <main class="main-content">
 
-            <!-- START -->
+            <!-- STARTSEITE -->
 
             <div class="app-view active" id="dashboardView">
 
@@ -78,17 +78,19 @@
 
                         <div class="stat-value">
                             <strong id="caloriesConsumed">0</strong>
-                            <span id="caloriesGoalLabel">/ 2000 kcal</span>
+                            <span id="caloriesGoalLabel">
+                                / 2000 kcal
+                            </span>
                         </div>
 
                         <div
                             class="progress-track"
+                            id="caloriesProgressTrack"
                             role="progressbar"
                             aria-label="Kalorienfortschritt"
                             aria-valuemin="0"
                             aria-valuemax="2000"
                             aria-valuenow="0"
-                            id="caloriesProgressTrack"
                         >
                             <div
                                 class="progress-fill"
@@ -112,17 +114,19 @@
 
                         <div class="stat-value">
                             <strong id="proteinConsumed">0</strong>
-                            <span id="proteinGoalLabel">/ 160 g</span>
+                            <span id="proteinGoalLabel">
+                                / 160 g
+                            </span>
                         </div>
 
                         <div
                             class="progress-track"
+                            id="proteinProgressTrack"
                             role="progressbar"
                             aria-label="Proteinfortschritt"
                             aria-valuemin="0"
                             aria-valuemax="160"
                             aria-valuenow="0"
-                            id="proteinProgressTrack"
                         >
                             <div
                                 class="progress-fill"
@@ -144,14 +148,113 @@
                     <div class="section-header">
                         <div>
                             <p class="eyebrow">Ernährung</p>
-                            <h2 id="foodSectionTitle">
+                            <h2 id="dashboardFoodTitle">
                                 Heute gegessen
                             </h2>
                         </div>
 
                         <button
                             class="primary-button"
-                            id="openFoodDialog"
+                            id="dashboardAddFoodButton"
+                            type="button"
+                        >
+                            Hinzufügen
+                        </button>
+                    </div>
+
+                    <div
+                        class="item-list compact-list"
+                        id="dashboardFoodList"
+                    ></div>
+
+                    <div
+                        class="empty-state"
+                        id="dashboardFoodEmptyState"
+                    >
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 3v7M10 3v7M7 7h3M8.5 10v11"/>
+                                <path d="M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"/>
+                            </svg>
+                        </div>
+
+                        <h3>Noch keine Einträge</h3>
+
+                        <p id="dashboardFoodEmptyText">
+                            Füge dein erstes Lebensmittel hinzu.
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            id="dashboardEmptyAddButton"
+                            type="button"
+                        >
+                            Lebensmittel hinzufügen
+                        </button>
+                    </div>
+
+                    <button
+                        class="text-button"
+                        id="openFoodViewButton"
+                        type="button"
+                    >
+                        Alle Lebensmittel verwalten
+                    </button>
+                </section>
+
+            </div>
+
+            <!-- ESSEN -->
+
+            <div class="app-view" id="foodView">
+
+                <section class="food-hero-card">
+                    <div class="summary-topline">
+                        <p class="summary-label">Ernährung</p>
+
+                        <button
+                            class="summary-date-button"
+                            id="foodViewDateButton"
+                            type="button"
+                        >
+                            Datum wählen
+                        </button>
+                    </div>
+
+                    <h2 id="foodViewTitle">
+                        Essen für heute
+                    </h2>
+
+                    <div class="food-hero-values">
+                        <div>
+                            <strong id="foodViewCalories">0</strong>
+                            <span>kcal</span>
+                        </div>
+
+                        <div>
+                            <strong id="foodViewProtein">0</strong>
+                            <span>g Protein</span>
+                        </div>
+
+                        <div>
+                            <strong id="foodViewCount">0</strong>
+                            <span>Einträge</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-card">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Lebensmittel</p>
+                            <h2 id="foodListTitle">
+                                Heutige Einträge
+                            </h2>
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            id="foodViewAddButton"
                             type="button"
                         >
                             Hinzufügen
@@ -161,17 +264,17 @@
                     <div class="item-list" id="foodList"></div>
 
                     <div class="empty-state" id="foodEmptyState">
-                        <div class="empty-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M7 3v7M10 3v7M7 7h3M8.5 10v11"/>
                                 <path d="M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"/>
                             </svg>
                         </div>
 
-                        <h3>Noch keine Einträge</h3>
+                        <h3>Noch keine Lebensmittel</h3>
 
                         <p id="foodEmptyText">
-                            Füge dein erstes Lebensmittel hinzu.
+                            Für diesen Tag gibt es noch keine Einträge.
                         </p>
 
                         <button
@@ -261,7 +364,11 @@
 
                 <section class="content-card">
                     <p class="eyebrow">Ausgewählter Tag</p>
-                    <h2 class="card-title" id="calendarSelectedDate">
+
+                    <h2
+                        class="card-title"
+                        id="calendarSelectedDate"
+                    >
                         Heute
                     </h2>
 
@@ -303,7 +410,7 @@
 
                         <button
                             class="summary-date-button"
-                            id="openWeightDialog"
+                            id="openWeightDialogButton"
                             type="button"
                         >
                             Eintragen
@@ -359,7 +466,7 @@
 
                         <button
                             class="primary-button"
-                            id="openWeightDialogSecondary"
+                            id="weightAddButton"
                             type="button"
                         >
                             Hinzufügen
@@ -376,7 +483,7 @@
                         id="weightEmptyState"
                     >
                         <div class="empty-icon weight-empty-icon">
-                            <svg viewBox="0 0 24 24">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M5 19h14"/>
                                 <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
                                 <path d="M9 8h6"/>
@@ -407,7 +514,9 @@
             <div class="app-view" id="settingsView">
 
                 <section class="settings-hero-card">
-                    <p class="summary-label">Persönliche Einstellungen</p>
+                    <p class="summary-label">
+                        Persönliche Einstellungen
+                    </p>
 
                     <h2 id="settingsGreeting">
                         Deine Ziele
@@ -427,8 +536,10 @@
                         </div>
                     </div>
 
-                    <form class="settings-form" id="settingsForm">
-
+                    <form
+                        class="settings-form"
+                        id="settingsForm"
+                    >
                         <label class="form-field">
                             <span>Anzeigename</span>
 
@@ -510,20 +621,75 @@
                         >
                             Einstellungen speichern
                         </button>
-
                     </form>
                 </section>
 
-                <section class="content-card information-card">
-                    <p class="eyebrow">Speicherung</p>
-                    <h2 class="card-title">Deine Daten</h2>
+                <section class="content-card">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Datensicherung</p>
+                            <h2>Export und Import</h2>
+                        </div>
+                    </div>
 
-                    <p>
-                        BodySync speichert deine Daten aktuell lokal
-                        auf diesem Gerät. Bei einem Wechsel des
-                        Browsers oder Geräts werden sie noch nicht
-                        automatisch übertragen.
+                    <p class="card-description">
+                        Sichere deine BodySync-Daten als Datei oder
+                        übertrage sie auf ein anderes Gerät.
                     </p>
+
+                    <div class="settings-actions">
+                        <button
+                            class="secondary-wide-button no-margin"
+                            id="exportDataButton"
+                            type="button"
+                        >
+                            Daten exportieren
+                        </button>
+
+                        <button
+                            class="secondary-wide-button no-margin"
+                            id="importDataButton"
+                            type="button"
+                        >
+                            Daten importieren
+                        </button>
+
+                        <input
+                            id="importFileInput"
+                            class="hidden-file-input"
+                            type="file"
+                            accept="application/json,.json"
+                        >
+                    </div>
+                </section>
+
+                <section class="content-card danger-card">
+                    <p class="eyebrow danger-eyebrow">
+                        Gefahrenbereich
+                    </p>
+
+                    <h2 class="card-title">
+                        Alle Daten zurücksetzen
+                    </h2>
+
+                    <p class="card-description">
+                        Dadurch werden alle Lebensmittel,
+                        Gewichtsmessungen und Einstellungen auf
+                        diesem Gerät gelöscht.
+                    </p>
+
+                    <button
+                        class="danger-wide-button"
+                        id="resetDataButton"
+                        type="button"
+                    >
+                        Alle Daten löschen
+                    </button>
+                </section>
+
+                <section class="version-card">
+                    <strong>BodySync v1.0</strong>
+                    <span>Erste stabile Version</span>
                 </section>
 
             </div>
@@ -537,7 +703,7 @@
                 id="dashboardTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M3 11.5 12 4l9 7.5"/>
                     <path d="M5.5 10.5V20h13v-9.5"/>
                     <path d="M9.5 20v-6h5v6"/>
@@ -545,9 +711,14 @@
                 <span>Start</span>
             </button>
 
-            <button class="tab-button" type="button" disabled>
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 5v14M5 12h14"/>
+            <button
+                class="tab-button"
+                id="foodTab"
+                type="button"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 3v7M10 3v7M7 7h3M8.5 10v11"/>
+                    <path d="M16 3v18M16 3c2.5 2.5 2.5 6.5 0 9"/>
                 </svg>
                 <span>Essen</span>
             </button>
@@ -557,7 +728,7 @@
                 id="calendarTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="16" rx="2"/>
                     <path d="M7 3v4M17 3v4M3 10h18"/>
                 </svg>
@@ -569,7 +740,7 @@
                 id="weightTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 19h14"/>
                     <path d="M7 16V8a5 5 0 0 1 10 0v8"/>
                     <path d="M9 8h6"/>
@@ -582,7 +753,7 @@
                 id="settingsTab"
                 type="button"
             >
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="12" r="3"/>
                     <path
                         d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.6.8 1 1 .3.2.7.3 1.1.3h.1v4h-.1c-.4 0-.8.1-1.1.3-.4.2-.8.6-1 1Z"
@@ -594,7 +765,7 @@
         </nav>
     </div>
 
-    <!-- LEBENSMITTEL -->
+    <!-- LEBENSMITTEL-DIALOG -->
 
     <dialog class="app-dialog" id="foodDialog">
         <form class="dialog-form" id="foodForm">
@@ -605,12 +776,14 @@
                         Neuer Eintrag
                     </p>
 
-                    <h2>Lebensmittel hinzufügen</h2>
+                    <h2 id="foodDialogTitle">
+                        Lebensmittel hinzufügen
+                    </h2>
                 </div>
 
                 <button
                     class="icon-button"
-                    id="closeFoodDialog"
+                    id="closeFoodDialogButton"
                     type="button"
                     aria-label="Fenster schließen"
                 >
@@ -671,7 +844,11 @@
 
             </div>
 
-            <p class="form-error" id="foodFormError"></p>
+            <p
+                class="form-error"
+                id="foodFormError"
+                role="alert"
+            ></p>
 
             <button class="submit-button" type="submit">
                 Eintrag speichern
@@ -680,7 +857,7 @@
         </form>
     </dialog>
 
-    <!-- GEWICHT -->
+    <!-- GEWICHTS-DIALOG -->
 
     <dialog class="app-dialog" id="weightDialog">
         <form class="dialog-form" id="weightForm">
@@ -698,7 +875,7 @@
 
                 <button
                     class="icon-button"
-                    id="closeWeightDialog"
+                    id="closeWeightDialogButton"
                     type="button"
                     aria-label="Fenster schließen"
                 >
@@ -735,7 +912,11 @@
                 </div>
             </label>
 
-            <p class="form-error" id="weightFormError"></p>
+            <p
+                class="form-error"
+                id="weightFormError"
+                role="alert"
+            ></p>
 
             <button class="submit-button" type="submit">
                 Messung speichern
@@ -743,6 +924,53 @@
 
         </form>
     </dialog>
+
+    <!-- BESTÄTIGUNGS-DIALOG -->
+
+    <dialog class="app-dialog confirmation-dialog" id="confirmDialog">
+        <div class="dialog-form">
+            <div class="confirmation-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 9v4"/>
+                    <path d="M12 17h.01"/>
+                    <path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/>
+                </svg>
+            </div>
+
+            <h2 id="confirmTitle">
+                Wirklich löschen?
+            </h2>
+
+            <p id="confirmMessage">
+                Dieser Vorgang kann nicht rückgängig gemacht werden.
+            </p>
+
+            <div class="confirmation-actions">
+                <button
+                    class="secondary-wide-button no-margin"
+                    id="cancelConfirmButton"
+                    type="button"
+                >
+                    Abbrechen
+                </button>
+
+                <button
+                    class="danger-wide-button no-margin"
+                    id="confirmActionButton"
+                    type="button"
+                >
+                    Löschen
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
 
     <script src="app.js"></script>
 </body>
